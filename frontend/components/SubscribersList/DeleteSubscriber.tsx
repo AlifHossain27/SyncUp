@@ -30,7 +30,7 @@ const DeleteSubscriber = ({uuid, first_name, last_name, email, department}: Subs
 
   return (
     <div>
-        <Button variant='destructive' size='lg' onClick={deleteSubscriber}><Trash2 size={40}/></Button>
+        <Button variant='outline' size='lg' onClick={deleteSubscriber}><Trash2 size={40}/></Button>
     </div>
   )
 }

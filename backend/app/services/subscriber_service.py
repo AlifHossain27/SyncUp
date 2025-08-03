@@ -19,8 +19,11 @@ def create_subscriber(subscriber: SubscriberCreate, db: Session) -> SubscriberSc
 
     return db_subscriber
 
-def retrieve_subscribers(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(Subscriber).offset(skip).limit(limit).all()
+def retrieve_subscribers(db: Session, skip: int = 0, limit: int = None):
+    query = db.query(Subscriber).offset(skip)
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
 def retrieve_subscriber_by_uuid(uuid: UUID, db: Session) -> SubscriberSchema:
     db_subscriber = db.query(Subscriber).filter(Subscriber.uuid == uuid).first()

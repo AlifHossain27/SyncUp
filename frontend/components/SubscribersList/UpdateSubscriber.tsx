@@ -66,6 +66,9 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
             await router.refresh()
             await form.resetField
             toast("Successfully Updated Subscriber",)
+            setTimeout(() => {
+                document.getElementById("dialog-close-button")?.click();
+                }, 50);
         } else {  
             await router.refresh()
             await form.resetField
@@ -81,12 +84,12 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
         <DialogTrigger asChild>
             <Button variant='outline' size='lg'><UserRoundPen size={40}/></Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className='px-10 py-15'>
             <DialogHeader>
-            <DialogTitle className="text-3xl">Update Subscriber:</DialogTitle>
+            <DialogTitle className="text-2xl">Update Subscriber:</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField
                     control={form.control}
                     name="first_name"
@@ -135,11 +138,12 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
                         </FormItem>
                     )}
                     />
-                    <DialogClose asChild>
                         <Button className='text-center w-full h-10 text-lg' type="submit" >Update Subscriber</Button>
-                    </DialogClose>
                 </form>
             </Form>
+            <DialogClose asChild>
+                    <Button id="dialog-close-button" className="hidden" />
+            </DialogClose>
         </DialogContent>
         </Dialog>
     </div>

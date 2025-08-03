@@ -59,6 +59,9 @@ const AddSubscriber = () => {
             await router.refresh()
             await form.reset();
             toast("Successfully Added New Subscriber",)
+            setTimeout(() => {
+                document.getElementById("dialog-close-button")?.click();
+                }, 50);
         } else {  
             toast.error(
                 `${resp.body?.detail} (Status ${resp.status})`
@@ -71,14 +74,14 @@ const AddSubscriber = () => {
     <div>
     <Dialog>
         <DialogTrigger asChild>
-            <Button variant='default' size='lg'><UserPlus size={40}/></Button>
+            <Button variant='default' size='lg'><UserPlus size={40}/>Add Subscriber</Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className='py-15 px-10'>
             <DialogHeader>
-            <DialogTitle className="text-3xl">Add new Subscriber:</DialogTitle>
+            <DialogTitle className="text-2xl">Add New Subscriber:</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField
                     control={form.control}
                     name="first_name"
@@ -127,11 +130,12 @@ const AddSubscriber = () => {
                         </FormItem>
                     )}
                     />
-                    <DialogClose asChild>
                         <Button className='text-center w-full h-10 text-lg' type="submit" >Add Subscriber</Button>
-                    </DialogClose>
                 </form>
             </Form>
+            <DialogClose asChild>
+                    <Button id="dialog-close-button" className="hidden" />
+            </DialogClose>
         </DialogContent>
         </Dialog>
     </div>
