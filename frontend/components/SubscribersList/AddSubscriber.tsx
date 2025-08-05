@@ -24,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { add_subscriber } from '@/actions/subscribers'
+import { DialogDescription } from '@radix-ui/react-dialog'
 
 const formSchema = z.object({
     first_name: z.string().min(4, {
@@ -79,6 +80,7 @@ const AddSubscriber = () => {
         <DialogContent className='py-15 px-10'>
             <DialogHeader>
             <DialogTitle className="text-2xl">Add New Subscriber:</DialogTitle>
+                <DialogDescription className='text-sm text-gray-500'>Enter the details of the new subscriber</DialogDescription>
             </DialogHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -86,7 +88,8 @@ const AddSubscriber = () => {
                     control={form.control}
                     name="first_name"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>First Name:</FormLabel>
                         <FormControl>
                             <Input autoComplete='off' placeholder="First Name" {...field} />
                         </FormControl>
@@ -98,7 +101,8 @@ const AddSubscriber = () => {
                     control={form.control}
                     name="last_name"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>Last Name:</FormLabel>
                         <FormControl>
                             <Input autoComplete='off' placeholder="Last Name" {...field} />
                         </FormControl>
@@ -110,7 +114,8 @@ const AddSubscriber = () => {
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>Email:</FormLabel>
                         <FormControl>
                             <Input autoComplete='off' placeholder="Email" {...field} />
                         </FormControl>
@@ -122,7 +127,8 @@ const AddSubscriber = () => {
                     control={form.control}
                     name="department"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>Department:</FormLabel>
                         <FormControl>
                             <Input autoComplete='off' placeholder="Department" {...field} />
                         </FormControl>
@@ -130,7 +136,10 @@ const AddSubscriber = () => {
                         </FormItem>
                     )}
                     />
+                    <div className='pt-5'>
                         <Button className='text-center w-full h-10 text-lg' type="submit" >Add Subscriber</Button>
+                    </div>
+                        
                 </form>
             </Form>
             <DialogClose asChild>

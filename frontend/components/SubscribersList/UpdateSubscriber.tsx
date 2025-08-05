@@ -10,6 +10,7 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogClose,
+    DialogDescription,
   } from "@/components/ui/dialog"
 import {
     Form,
@@ -86,7 +87,8 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
         </DialogTrigger>
         <DialogContent className='px-10 py-15'>
             <DialogHeader>
-            <DialogTitle className="text-2xl">Update Subscriber:</DialogTitle>
+                <DialogTitle className="text-2xl">Update Subscriber:</DialogTitle>
+                <DialogDescription className='text-sm text-gray-500'>Update the details for {first_name} {last_name}</DialogDescription>
             </DialogHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -94,7 +96,8 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
                     control={form.control}
                     name="first_name"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>First Name:</FormLabel>
                         <FormControl>
                             <Input autoComplete='off' placeholder="First Name" {...field} />
                         </FormControl>
@@ -106,7 +109,8 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
                     control={form.control}
                     name="last_name"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>Last Name:</FormLabel>
                         <FormControl>
                             <Input autoComplete='off' placeholder="Last Name" {...field} />
                         </FormControl>
@@ -118,7 +122,8 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>Email:</FormLabel>
                         <FormControl>
                             <Input autoComplete='off' placeholder="Email" {...field} />
                         </FormControl>
@@ -130,7 +135,8 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
                     control={form.control}
                     name="department"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>Department:</FormLabel>
                         <FormControl>
                             <Input autoComplete='off' placeholder="Department" {...field} />
                         </FormControl>
@@ -138,7 +144,9 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
                         </FormItem>
                     )}
                     />
-                        <Button className='text-center w-full h-10 text-lg' type="submit" >Update Subscriber</Button>
+                        <div className='pt-5'>
+                            <Button className='text-center w-full h-10 text-lg' type="submit" >Update Subscriber</Button>
+                        </div>
                 </form>
             </Form>
             <DialogClose asChild>

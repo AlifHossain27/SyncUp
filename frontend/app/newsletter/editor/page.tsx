@@ -41,7 +41,7 @@ const NewsLetterEditorPage = () => {
     return (
         <div className='flex flex-col min-h-[85vh] relative'>
             <div className='container flex flex-col flex-1 mx-auto'>
-                <div className='flex-1 px-12 py-10 w-full overflow-y-auto'>
+                <div className='flex-1 px-20 py-10 w-full overflow-y-auto'>
                     <TextareaAutosize 
                         placeholder='Untitled'
                         value={title}
