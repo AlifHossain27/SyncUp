@@ -1,16 +1,33 @@
 "use client";
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu, Bot } from 'lucide-react';
+import { toast } from "sonner"
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = React.useState(false);
-  const [isSheetOpen, setIsSheetOpen] = React.useState(false);
+  const router = useRouter()
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  React.useEffect(() => {
+  const logout = async() => {
+        await fetch('http://localhost:8000/api/auth/logout/',{
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          credentials: 'include'
+        })
+        toast("Logged out",)
+        localStorage.removeItem('isLoggedIn');
+        setIsLoggedIn(false);
+        setIsSheetOpen(false);
+        await router.refresh()
+        await router.push('/')
+      }
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -20,11 +37,23 @@ const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedIn(loggedIn);
+  }, []);
+
   const navLinks = [
-    { href: '#content', label: 'Content' },
-    { href: '#authors', label: 'Authors' },
-    { href: '/subscribers/', label: 'Subscribers' },
+    { href: '/newsletter/', label: 'Newsletters' },
+    { href: '/about', label: 'About Us' },
   ];
+
+  const adminNavLinks = [
+    { href: '/newsletter/', label: 'Newsletter' },
+    { href: '/subscribers/', label: 'Subscribers' },
+    { href: '/profile/', label: 'Profile' },
+  ];
+
+  const linksToShow = isLoggedIn ? adminNavLinks : navLinks;
 
   return (
     <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-sm border-b border-border' : 'bg-transparent'}`}>
@@ -34,11 +63,16 @@ const Header = () => {
           <span className="text-xl font-bold font-headline text-foreground">SyncUp</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
+          {linksToShow.map((link) => (
             <Link key={link.href} href={link.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
               {link.label}
             </Link>
           ))}
+          {isLoggedIn && (
+            <Button variant="destructive" className="text-sm" onClick={logout}>
+              Logout
+            </Button>
+          )}
         </nav>
         <div className="md:hidden">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -55,11 +89,16 @@ const Header = () => {
                   <Bot className="h-6 w-6 text-primary" />
                   <span className="text-xl font-bold font-headline text-foreground">SyncUp</span>
                 </Link>
-                {navLinks.map((link) => (
+                {linksToShow.map((link) => (
                   <Link key={link.href} href={link.href} className="text-lg font-medium text-foreground transition-colors hover:text-accent" onClick={() => setIsSheetOpen(false)}>
                     {link.label}
                   </Link>
                 ))}
+                {isLoggedIn && (
+                  <Button variant="destructive" className="text-sm" onClick={logout}>
+                    Logout
+                  </Button>
+                )}
               </div>
             </SheetContent>
           </Sheet>

@@ -13,6 +13,7 @@ from app.services.user_service import (
     get_user_by_uuid,
     change_password,
     update_user,
+    logout_user,
     CurrentUser
 )
 from app.exceptions.handler import (
@@ -47,12 +48,20 @@ async def login_route(response: Response, data: Annotated[OAuth2PasswordRequestF
             httponly=True,
             secure=False,
             samesite="lax",
-            max_age=60 * 60 * 24 * 7,
+            max_age=60 * 60 * 24,
             path="/",
         )
         return token
     except (NotFoundException, ConflictException, BadRequestException, UnauthorizedException) as error:
         raise error
+    except Exception as e:
+        print(traceback.format_exc())
+        raise BadRequestException()
+    
+@user_router.post("/auth/logout", status_code=204)
+async def logout_route(response: Response):
+    try:
+        logout_user(response)
     except Exception as e:
         print(traceback.format_exc())
         raise BadRequestException()
@@ -81,3 +90,4 @@ async def update_user_route(current_user: CurrentUser, user: UserCreate, db: Ses
 @user_router.patch("/user/change-password", status_code=200)
 async def change_password_route(new_password: PasswordChange, current_user: CurrentUser, db: Session = Depends(get_db)):
     change_password(current_user=current_user, new_password=new_password, db=db)
+

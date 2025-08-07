@@ -7,7 +7,7 @@ import jwt
 from jwt import PyJWTError
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastapi import Depends, Cookie
+from fastapi import Depends, Cookie,  Response
 from app.core.config import settings
 from app.models.user_model import User
 from app.schemas.user_schemas import Token, TokenData, UserCreate, UserSchema, PasswordChange
@@ -125,3 +125,10 @@ def change_password(current_user: TokenData, new_password: PasswordChange, db: S
     
     user.password = get_password_hash(new_password.new_password)
     db.commit()
+
+def logout_user(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        httponly=True
+    )

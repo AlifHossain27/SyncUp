@@ -14,7 +14,7 @@ import Link from "next/link";
 import { Bot } from "lucide-react";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
+  email: z.email({ message: "Please enter a valid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
 
@@ -40,10 +40,10 @@ export default function LoginPage() {
             credentials: 'include',
         })
         if (resp.ok){
-            const data = await resp.json()
-            await router.push('/')
+            localStorage.setItem('isLoggedIn', 'true');
             toast("Login Successful")
             await router.refresh()
+            window.location.href = "/";
         }else{
             toast.error(
                     `Login Failed (Status ${resp.status})`
@@ -76,7 +76,7 @@ export default function LoginPage() {
                                         <FormItem>
                                             <FormLabel>Email</FormLabel>
                                             <FormControl>
-                                                <Input type="email" placeholder="admin@university.edu" {...field} />
+                                                <Input type="email" autoComplete='off' placeholder="admin@university.edu" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
