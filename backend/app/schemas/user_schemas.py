@@ -9,9 +9,13 @@ class UserCreate(UserBase):
     username: str
     password: str
 
+class UserUpdate(UserBase):
+    email: EmailStr
+    username: str
 
 class UserSchema(UserBase):
     uuid: UUID
+    username: str
     created_at: datetime
     updated_at: datetime
 

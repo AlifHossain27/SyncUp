@@ -33,7 +33,7 @@ export default function RootLayout({
         <main className="flex">
           <div className='flex flex-col w-full'>
             <Header/>
-            <div className='absolute top-16 left-0 w-screen md:relative lg:relative md:top-0 lg:top-0 md:w-full lg:w-full'>
+            <div className='flex-1'>
                 {children}
             </div>
             <Footer/>

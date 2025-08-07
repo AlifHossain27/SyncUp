@@ -10,7 +10,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from fastapi import Depends, Cookie,  Response
 from app.core.config import settings
 from app.models.user_model import User
-from app.schemas.user_schemas import Token, TokenData, UserCreate, UserSchema, PasswordChange
+from app.schemas.user_schemas import Token, TokenData, UserCreate, UserUpdate, UserSchema, PasswordChange
 from app.exceptions.handler import (
     UnauthorizedException,
     NotFoundException,
@@ -93,7 +93,7 @@ def get_user_by_uuid(uuid: UUID, db: Session) -> UserSchema:
         raise NotFoundException(f"User with ID {uuid} not found")
     return user
 
-def update_user(uuid: UUID, updated_attributes: UserCreate, db: Session) -> UserSchema:
+def update_user(uuid: UUID, updated_attributes: UserUpdate, db: Session) -> UserSchema:
     user = db.query(User).filter(User.uuid == uuid).first()
     if not user:
         raise NotFoundException(f"User with ID {uuid} not found")

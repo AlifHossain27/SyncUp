@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.core.rate_limiting import limiter
 from app.db.deps import get_db
-from app.schemas.user_schemas import UserCreate, UserSchema, Token, PasswordChange
+from app.schemas.user_schemas import UserCreate, UserUpdate, UserSchema, Token, PasswordChange
 from app.services.user_service import (
     register_user,
     login_user,
@@ -76,8 +76,8 @@ async def get_current_user_route(current_user: CurrentUser, db: Session = Depend
         print(traceback.format_exc())
         raise BadRequestException()
     
-@user_router.patch("/user/me/", response_model=UserCreate, status_code=201)
-async def update_user_route(current_user: CurrentUser, user: UserCreate, db: Session = Depends(get_db)):
+@user_router.patch("/user/me/", response_model=UserUpdate, status_code=201)
+async def update_user_route(current_user: CurrentUser, user: UserUpdate, db: Session = Depends(get_db)):
     try:
         uuid = current_user.get_uuid()
         return update_user(uuid=uuid, updated_attributes=user, db=db)

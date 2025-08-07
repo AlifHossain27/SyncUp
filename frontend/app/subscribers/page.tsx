@@ -5,7 +5,7 @@ const SubscribersPage = () => {
   return (
     <div className="flex flex-col bg-background">
       
-      <main className="flex-grow px-40 py-10">
+      <main className="container mx-auto py-4 flex flex-col gap-5">
         <SubscribersDataTable/>
       </main>
       
