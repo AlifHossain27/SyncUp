@@ -2,6 +2,7 @@ export async function add_subscriber(first_name: string, last_name: string, emai
     const resp = await fetch("http://localhost:8000/api/subscriber/create/",{
         method: 'POST',
         headers: {'Content-Type':'application/json'},
+        credentials: 'include',
         body: JSON.stringify({
         'first_name': first_name,
         'last_name': last_name,
@@ -21,6 +22,7 @@ export async function update_subscriber(uuid: string, first_name: string, last_n
     const resp = await fetch(`http://localhost:8000/api/subscriber/${uuid}/`,{
         method: 'PATCH',
         headers: {'Content-Type':'application/json'},
+        credentials: 'include',
         body: JSON.stringify({
         'first_name': first_name,
         'last_name': last_name,
@@ -39,7 +41,8 @@ export async function update_subscriber(uuid: string, first_name: string, last_n
 export async function delete_subscriber(uuid: string){
     const resp = await fetch(`http://localhost:8000/api/subscriber/${uuid}/`,{
         method: 'DELETE',
-        headers: {'Content-Type':'application/json'}
+        headers: {'Content-Type':'application/json'},
+        credentials: 'include'
     })
     let data = null;
     if (resp.status !== 204) {

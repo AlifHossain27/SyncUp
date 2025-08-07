@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import subscriber
+from app.routers import subscriber, user
 from app.db.database import Base, engine
 
 app = FastAPI(
@@ -27,3 +27,4 @@ Base.metadata.create_all(bind=engine)
 
 
 app.include_router(subscriber.subscriber_router, prefix="/api", tags=["Subscribers"])
+app.include_router(user.user_router, prefix="/api", tags=["Users"])

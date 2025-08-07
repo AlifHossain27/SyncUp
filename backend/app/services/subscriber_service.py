@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from datetime import datetime, timezone
 from app.schemas.subscriber_schemas import SubscriberCreate, SubscriberSchema
-from app.models.subscriber_models import Subscriber
+from app.models.subscriber_model import Subscriber
 from app.exceptions.handler import (
     ConflictException,
     NotFoundException

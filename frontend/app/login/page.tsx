@@ -2,6 +2,8 @@
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { useRouter } from 'next/navigation'
+import React, { useState, useContext } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +19,7 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
+    const router= useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -25,9 +28,28 @@ export default function LoginPage() {
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values);
-        toast("Login Successful!",);
+        const formData = new URLSearchParams()
+        formData.append('username', values.email)
+        formData.append('password', values.password)
+        const resp = await fetch("http://localhost:8000/api/auth/token/",{
+            method: 'POST',
+            headers: {'Content-Type':'application/x-www-form-urlencoded'},
+            body: formData
+        })
+        if (resp.ok){
+            const data = await resp.json()
+            localStorage.setItem('token', data.access_token)
+            await router.push('/')
+            toast("Login Successful")
+            await router.refresh()
+        }else{
+            toast.error(
+                    `Login Failed (Status ${resp.status})`
+                );
+            await router.refresh()
+        }
     }
 
     return (

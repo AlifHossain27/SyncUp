@@ -11,6 +11,7 @@ from app.services.subscriber_service import (
     retrieve_subscriber_by_uuid,
     delete_subscriber
 )
+from app.services.user_service import verify_token
 from app.exceptions.handler import (
     NotFoundException,
     ConflictException,
@@ -47,7 +48,7 @@ async def get_subscriber_route(uuid: UUID, db: Session = Depends(get_db)):
         raise error
     except Exception as e:
         print(traceback.format_exc())
-        raise BadRequestException
+        raise BadRequestException()
     
 @subscriber_router.patch("/subscriber/{uuid}/", response_model=SubscriberCreate, status_code=201)
 async def update_subscriber_route(uuid: UUID, subscriber: SubscriberCreate, db: Session = Depends(get_db)):
