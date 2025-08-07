@@ -11,7 +11,8 @@ from app.services.subscriber_service import (
     retrieve_subscriber_by_uuid,
     delete_subscriber
 )
-from app.services.user_service import verify_token
+from app.services.user_service import CurrentUser, get_current_user
+from app.schemas.user_schemas import TokenData
 from app.exceptions.handler import (
     NotFoundException,
     ConflictException,
@@ -23,7 +24,7 @@ from app.exceptions.handler import (
 subscriber_router = APIRouter()
 
 @subscriber_router.post("/subscriber/create/", response_model=SubscriberSchema, status_code=201)
-async def create_subscriber_route(subscriber: SubscriberCreate, db: Session = Depends(get_db)):
+async def create_subscriber_route(subscriber: SubscriberCreate, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
         return create_subscriber(subscriber=subscriber, db=db)
     except (NotFoundException, ConflictException, BadRequestException) as error:
@@ -33,7 +34,7 @@ async def create_subscriber_route(subscriber: SubscriberCreate, db: Session = De
         raise BadRequestException()
 
 @subscriber_router.get("/subscribers/", response_model=list[SubscriberSchema], status_code=200)
-async def get_subscribers_route(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+async def get_subscribers_route( current_user: TokenData = Depends(get_current_user), skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     try:
         return retrieve_subscribers(db=db, skip=skip, limit=limit)
     except Exception as error:
@@ -41,7 +42,7 @@ async def get_subscribers_route(skip: int = 0, limit: int = 10, db: Session = De
         raise BadRequestException
     
 @subscriber_router.get("/subscriber/{uuid}/", response_model=SubscriberSchema, status_code=200)
-async def get_subscriber_route(uuid: UUID, db: Session = Depends(get_db)):
+async def get_subscriber_route(uuid: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
         return retrieve_subscriber_by_uuid(uuid=uuid, db=db)
     except (NotFoundException, BadRequestException) as error:
@@ -51,7 +52,7 @@ async def get_subscriber_route(uuid: UUID, db: Session = Depends(get_db)):
         raise BadRequestException()
     
 @subscriber_router.patch("/subscriber/{uuid}/", response_model=SubscriberCreate, status_code=201)
-async def update_subscriber_route(uuid: UUID, subscriber: SubscriberCreate, db: Session = Depends(get_db)):
+async def update_subscriber_route(uuid: UUID, subscriber: SubscriberCreate, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
         return update_subscriber(uuid=uuid, updated_attributes=subscriber, db=db)
     except (NotFoundException, ConflictException, BadRequestException) as error:
@@ -61,7 +62,7 @@ async def update_subscriber_route(uuid: UUID, subscriber: SubscriberCreate, db: 
         raise BadRequestException()
     
 @subscriber_router.delete("/subscriber/{uuid}/", status_code=204)
-async def delete_subscriber_route(uuid: UUID, db: Session = Depends(get_db)):
+async def delete_subscriber_route(uuid: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
         delete_subscriber(uuid=uuid, db=db)
         return {"detail": "Subscriber deleted successfully"}

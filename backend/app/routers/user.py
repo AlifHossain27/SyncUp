@@ -1,7 +1,7 @@
 import traceback
 from typing import Annotated
 from uuid import UUID
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.core.rate_limiting import limiter
@@ -38,9 +38,19 @@ async def register_user_route(request: Request, user: UserCreate, db: Session = 
         raise BadRequestException()
     
 @user_router.post("/auth/token", response_model=Token)
-async def login_route(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
+async def login_route(response: Response, data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
     try:
-        return login_user(data=data, db=db)
+        token = login_user(data=data, db=db)
+        response.set_cookie(
+            key="access_token",
+            value=token.access_token,
+            httponly=True,
+            secure=False,
+            samesite="lax",
+            max_age=60 * 60 * 24 * 7,
+            path="/",
+        )
+        return token
     except (NotFoundException, ConflictException, BadRequestException, UnauthorizedException) as error:
         raise error
     except Exception as e:

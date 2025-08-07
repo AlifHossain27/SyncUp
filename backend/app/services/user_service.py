@@ -7,7 +7,7 @@ import jwt
 from jwt import PyJWTError
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastapi import Depends
+from fastapi import Depends, Cookie
 from app.core.config import settings
 from app.models.user_model import User
 from app.schemas.user_schemas import Token, TokenData, UserCreate, UserSchema, PasswordChange
@@ -44,6 +44,8 @@ def create_access_token(email: str, uuid: UUID, expires_delta: timedelta) -> str
     return jwt.encode(encode, settings.SECRET_KEY, settings.ALGORITHM)
 
 def verify_token(token: str) -> TokenData:
+    if not token or token.count('.') != 2:
+        raise UnauthorizedException("Invalid token format")
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         uuid: str = payload['id']
@@ -51,6 +53,11 @@ def verify_token(token: str) -> TokenData:
     except PyJWTError as error:
         print(traceback.format_exc())
         raise UnauthorizedException(error)
+    
+def get_token_from_cookie(access_token: str | None = Cookie(None)) -> str:
+    if not access_token:
+        raise UnauthorizedException("Not authenticated")
+    return access_token
     
 def register_user(db: Session, user: UserCreate) -> UserSchema:
     if db.query(User).filter((User.email == user.email) | (User.username == user.username)).first():
@@ -68,7 +75,7 @@ def register_user(db: Session, user: UserCreate) -> UserSchema:
 
     return new_user
 
-def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]) -> TokenData:
+def get_current_user(token: Annotated[str, Depends(get_token_from_cookie)]) -> TokenData:
     return verify_token(token)
 
 CurrentUser = Annotated[TokenData, Depends(get_current_user)]

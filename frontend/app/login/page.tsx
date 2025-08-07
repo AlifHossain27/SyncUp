@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/navigation'
-import React, { useState, useContext } from "react";
+import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,11 +36,11 @@ export default function LoginPage() {
         const resp = await fetch("http://localhost:8000/api/auth/token/",{
             method: 'POST',
             headers: {'Content-Type':'application/x-www-form-urlencoded'},
-            body: formData
+            body: formData,
+            credentials: 'include',
         })
         if (resp.ok){
             const data = await resp.json()
-            localStorage.setItem('token', data.access_token)
             await router.push('/')
             toast("Login Successful")
             await router.refresh()
