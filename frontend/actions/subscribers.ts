@@ -1,5 +1,6 @@
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export async function add_subscriber(first_name: string, last_name: string, email: string, department: string){
-    const resp = await fetch("http://localhost:8000/api/subscriber/create/",{
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/create/`,{
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         credentials: 'include',
@@ -19,7 +20,7 @@ export async function add_subscriber(first_name: string, last_name: string, emai
 }
 
 export async function update_subscriber(uuid: string, first_name: string, last_name: string, email: string, department: string){
-    const resp = await fetch(`http://localhost:8000/api/subscriber/${uuid}/`,{
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/${uuid}/`,{
         method: 'PATCH',
         headers: {'Content-Type':'application/json'},
         credentials: 'include',
@@ -39,7 +40,7 @@ export async function update_subscriber(uuid: string, first_name: string, last_n
 }
 
 export async function delete_subscriber(uuid: string){
-    const resp = await fetch(`http://localhost:8000/api/subscriber/${uuid}/`,{
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/${uuid}/`,{
         method: 'DELETE',
         headers: {'Content-Type':'application/json'},
         credentials: 'include'

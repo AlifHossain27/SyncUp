@@ -8,13 +8,14 @@ import { Menu, Bot } from 'lucide-react';
 import { toast } from "sonner"
 
 const Header = () => {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const router = useRouter()
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const logout = async() => {
-        await fetch('http://localhost:8000/api/auth/logout/',{
+        await fetch(`${API_BASE_URL}/api/auth/logout/`,{
           method: 'POST',
           headers: {'Content-Type':'application/json'},
           credentials: 'include'

@@ -4,7 +4,8 @@ import { DataTable } from "./dataTable"
 import { cookies } from "next/headers"
 
 async function getData(): Promise<Subscribers[]> {
-    const resp = await fetch("http://localhost:8000/api/subscribers/",{
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const resp = await fetch(`${API_BASE_URL}/api/subscribers/`,{
         method: "GET",
         headers: { Cookie: cookies().toString() },
         credentials: 'include',
