@@ -4,18 +4,20 @@ import { toast } from "sonner"
 import { Button } from '@/components/ui/button';
 import TextareaAutosize from 'react-textarea-autosize';
 import dynamic from 'next/dynamic';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { BlockNoteEditor } from '@blocknote/core';
 import { Loader2 } from 'lucide-react';
 import Cover from '@/components/Cover';
-import { create_newsletter } from '@/actions/newsletters';
+import { update_newsletter, get_newsletter } from '@/actions/newsletters';
 
-const NewsLetterEditorPage = () => {
+const NewsLetterUpdatePage = ({ params }: { params: { slug: string}}) => {
     const router = useRouter()
     const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [title, setTitle] = useState("");
     const [coverUrl, setCoverUrl] = useState("")
+    const [slug, setSlug] = useState(params.slug)
+    const [initialContent, setInitialContent] = useState<string | undefined>();
 
     const Editor = useMemo(
         () =>
@@ -26,14 +28,29 @@ const NewsLetterEditorPage = () => {
         []
     );
 
+    useEffect(() => {
+    async function fetchNewsletter() {
+      const resp = await get_newsletter(params.slug);
+      if (resp.ok) {
+        const data = resp.body;
+        setTitle(data.title);
+        setCoverUrl(data.thumbnail ?? "");
+        setInitialContent(data.content);
+      } else {
+        toast.error("Failed to load newsletter data");
+      }
+    }
+    fetchNewsletter();
+  }, [params.slug]);
+
     const handleSave = async () => {
         if (!editor) return;
 
         setIsSaving(true);
         try {
             const content = await JSON.stringify(editor.document);
-
-            const resp = await create_newsletter(title, content, title.toLowerCase().replace(/\s+/g, "-"), coverUrl, "draft")
+            setSlug(title.toLowerCase().replace(/\s+/g, "-"))
+            const resp = await update_newsletter(title, content, slug, coverUrl, "draft", params.slug)
            if (resp.ok){
             await router.refresh()
             toast("Newsletter saved",)
@@ -90,7 +107,7 @@ const NewsLetterEditorPage = () => {
                         </div>
 
                         <div className="flex-1 min-h-[40vh]">
-                            <Editor onEditorReady={setEditor} />
+                            <Editor initialContent={initialContent} onEditorReady={setEditor} />
                         </div>
                     </div>
 
@@ -113,4 +130,4 @@ const NewsLetterEditorPage = () => {
     );
 };
 
-export default NewsLetterEditorPage;
+export default NewsLetterUpdatePage;
