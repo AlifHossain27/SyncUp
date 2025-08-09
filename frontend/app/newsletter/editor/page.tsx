@@ -14,6 +14,7 @@ const NewsLetterEditorPage = () => {
     const router = useRouter()
     const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
     const [title, setTitle] = useState("");
     const [coverUrl, setCoverUrl] = useState("")
 
@@ -48,7 +49,29 @@ const NewsLetterEditorPage = () => {
             setIsSaving(false);
         }
     }
-        
+    
+    const handlePublish = async () => {
+        if (!editor) return;
+
+        setIsPublishing(true);
+        try {
+            const content = await editor.blocksToHTMLLossy(editor.document);
+
+            const resp = await create_newsletter(title, content, title.toLowerCase().replace(/\s+/g, "-"), coverUrl, "published")
+           if (resp.ok){
+            await router.refresh()
+            toast("Newsletter published",)
+            await router.push('/newsletter')
+        } else {  
+            toast.error(
+                `${resp.body?.detail} (Status ${resp.status})`
+            );
+            await router.refresh()
+            }
+        }finally {
+            setIsPublishing(false);
+        }
+    }
 
     const enableCover = () => {
         setCoverUrl("https://www.geoface.com/wp-content/themes/u-design/assets/images/placeholders/post-placeholder.jpg")
@@ -105,7 +128,16 @@ const NewsLetterEditorPage = () => {
                             )}
                             {isSaving ? 'Saving...' : 'Save'}
                         </Button>
-                        <Button variant="secondary">Publish</Button>
+                        <Button 
+                            variant="secondary"
+                            onClick={handlePublish}
+                            disabled={isPublishing}
+                        >
+                            {isPublishing && (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            {isPublishing ? 'Publishing...' : 'Publish'}
+                        </Button>
                     </div>
                 </div>
             </div>

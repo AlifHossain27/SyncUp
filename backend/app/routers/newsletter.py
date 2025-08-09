@@ -10,6 +10,7 @@ from app.services.newsletter_service import (
     update_newsletter,
     retrieve_newsletter_by_slug,
     retrieve_draft_newsletters,
+    retrieve_archive_newsletters,
     delete_newsletter
 )
 from app.services.user_service import CurrentUser, get_current_user
@@ -35,7 +36,7 @@ async def create_newsletter_route(newsletter: NewsletterCreate, db: Session = De
         raise BadRequestException()
     
 @newsletter_router.get("/newsletter/{slug}/", response_model=NewsletterSchema, status_code=200)
-async def retrieve_newsletter_route(slug: str, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+async def retrieve_newsletter_route(slug: str, db: Session = Depends(get_db)):
     try:
         return retrieve_newsletter_by_slug(slug=slug, db=db)
     except (NotFoundException, BadRequestException) as error:
@@ -51,7 +52,15 @@ async def get_draft_newsletters_route(db: Session = Depends(get_db), current_use
     except Exception as e:
         print(traceback.format_exc())
         raise BadRequestException()
-    
+
+@newsletter_router.get("/newsletters/archive/", response_model=List[NewsletterSchema], status_code=200)
+async def get_archive_newsletters_route(db: Session = Depends(get_db)):
+    try:
+        return retrieve_archive_newsletters(db=db)
+    except Exception as e:
+        print(traceback.format_exc())
+        raise BadRequestException()
+     
 @newsletter_router.patch("/newsletter/{slug}/", response_model=NewsletterSchema, status_code=201)
 async def update_newsletter_route(slug: str, newsletter: NewsletterUpdate, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:

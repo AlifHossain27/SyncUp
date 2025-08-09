@@ -23,7 +23,7 @@ const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Button size="lg" asChild>
-                <a href="#content" className="group">
+                <a href="/newsletter" className="group">
                     Explore Content <ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
                 </a>
               </Button>

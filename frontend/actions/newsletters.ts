@@ -69,6 +69,20 @@ export async function get_draft_newsletters() {
     };
 }
 
+export async function get_archive_newsletters() {
+    const resp = await fetch(`${API_BASE_URL}/api/newsletters/archive/`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+    });
+    const data = await resp.json();
+    return {
+        ok: resp.ok,
+        status: resp.status,
+        body: data,
+    };
+}
+
 export async function delete_newsletter(uuid: string) {
     const resp = await fetch(`${API_BASE_URL}/api/newsletter/${uuid}/`, {
         method: 'DELETE',

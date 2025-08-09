@@ -10,6 +10,7 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { ImSpinner2 } from "react-icons/im";
 import {
   Dialog,
   DialogContent,
@@ -26,10 +27,8 @@ interface Newsletter {
   title: string;
   slug: string;
   summary?: string;
-  issue?: number;
   thumbnail?: string;
   status: string;
-  image?: string;
 }
 
 const DraftList = () => {
@@ -51,7 +50,9 @@ const DraftList = () => {
     fetchDrafts();
   }, []);
 
-  if (loading) return <p>Loading drafts...</p>;
+  if (loading) return (<div className='pt-20 flex justify-center'>
+          <ImSpinner2 className="animate-spin" size="50" />
+        </div>);
 
   const openDeleteDialog = (uuid: string) => {
     setDeleteTarget(uuid);
@@ -88,8 +89,12 @@ const DraftList = () => {
           </Link>
         </Button>
       </div>
-
-      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
+      {loading ? (
+        <div className='flex justify-center'>
+          <ImSpinner2 className="animate-spin" size="50" />
+        </div>
+      ) : 
+      (<div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
         {drafts.length === 0 && <p>No drafts found.</p>}
         {drafts.map((newsletter) => (
           <Card
@@ -120,16 +125,13 @@ const DraftList = () => {
                   <Edit className="h-4 w-4 mr-2" /> Edit
                 </Button>
               </Link>
-              <Button variant="default" size="sm" className="hover:cursor-pointer">
-                <Send className="h-4 w-4 mr-2" /> Publish
-              </Button>
               <Button variant="destructive" size="icon" className="hover:cursor-pointer" onClick={() => openDeleteDialog(newsletter.uuid)}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </CardFooter>
           </Card>
         ))}
-      </div>
+      </div>)}
       <Separator className="my-16" />
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

@@ -13,7 +13,7 @@ def create_newsletter(newsletter: NewsletterCreate, db: Session) -> NewsletterSc
         raise ConflictException(f"Newsletter with title {newsletter.title} already exists")
     db_newsletter = Newsletter(**newsletter.model_dump())
     if newsletter.status == "published":
-        newsletter.published_at = datetime.now(tz = timezone.utc)
+        db_newsletter.published_at = datetime.now(tz = timezone.utc)
 
     db.add(db_newsletter)
     db.commit()
@@ -30,6 +30,10 @@ def retrieve_newsletter_by_slug(slug: str, db: Session) -> NewsletterSchema:
 
 def retrieve_draft_newsletters(db: Session) -> NewsletterSchema:
     drafts = db.query(Newsletter).filter(Newsletter.status == "draft").all()
+    return drafts
+
+def retrieve_archive_newsletters(db: Session) -> NewsletterSchema:
+    drafts = db.query(Newsletter).filter(Newsletter.status == "published").all()
     return drafts
 
 def update_newsletter(slug: str, newsletter: NewsletterUpdate, db: Session) -> NewsletterSchema:
