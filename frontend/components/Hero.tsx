@@ -16,7 +16,7 @@ const Hero = () => {
               Stay Ahead of the Curve
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter text-foreground">
-              Your Weekly Dose of Digital Insight
+              Your Monthly Dose of Digital Insight
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto md:mx-0">
               Explore the frontiers of knowledge with SyncUp. We deliver cutting-edge articles on tech, science, and creativity, straight from the University Computer Club.

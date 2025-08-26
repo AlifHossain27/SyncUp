@@ -18,30 +18,30 @@ const Footer = () => {
                         <div>
                             <h4 className="font-semibold mb-4 text-foreground">Quick Links</h4>
                             <ul className="space-y-2">
-                                <li><Link href="#content" className="text-sm text-muted-foreground hover:text-accent transition-colors">Articles</Link></li>
-                                <li><Link href="#authors" className="text-sm text-muted-foreground hover:text-accent transition-colors">Authors</Link></li>
-                                <li><Link href="#contact" className="text-sm text-muted-foreground hover:text-accent transition-colors">Contact</Link></li>
+                                <li><Link href="#content" className="text-sm text-muted-foreground hover:text-black transition-colors">Articles</Link></li>
+                                <li><Link href="#authors" className="text-sm text-muted-foreground hover:text-black transition-colors">Authors</Link></li>
+                                <li><Link href="#contact" className="text-sm text-muted-foreground hover:text-black transition-colors">Contact</Link></li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="font-semibold mb-4 text-foreground">Community</h4>
                             <ul className="space-y-2">
-                                <li><Link href="#" className="text-sm text-muted-foreground hover:text-accent transition-colors">About The Club</Link></li>
-                                <li><Link href="#" className="text-sm text-muted-foreground hover:text-accent transition-colors">Events</Link></li>
-                                <li><Link href="#" className="text-sm text-muted-foreground hover:text-accent transition-colors">Join Us</Link></li>
+                                <li><Link href="#" className="text-sm text-muted-foreground hover:text-black transition-colors">About The Club</Link></li>
+                                <li><Link href="#" className="text-sm text-muted-foreground hover:text-black transition-colors">Events</Link></li>
+                                <li><Link href="#" className="text-sm text-muted-foreground hover:text-black transition-colors">Join Us</Link></li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="font-semibold mb-4 text-foreground">Follow Us</h4>
                             <div className="flex gap-4">
                                 <Link href="#" aria-label="Twitter">
-                                    <Twitter className="h-5 w-5 text-muted-foreground hover:text-accent transition-colors" />
+                                    <Twitter className="h-5 w-5 text-muted-foreground hover:text-black transition-colors" />
                                 </Link>
                                  <Link href="#" aria-label="GitHub">
-                                    <Github className="h-5 w-5 text-muted-foreground hover:text-accent transition-colors" />
+                                    <Github className="h-5 w-5 text-muted-foreground hover:text-black transition-colors" />
                                 </Link>
                                 <Link href="#" aria-label="RSS Feed">
-                                    <Rss className="h-5 w-5 text-muted-foreground hover:text-accent transition-colors" />
+                                    <Rss className="h-5 w-5 text-muted-foreground hover:text-black transition-colors" />
                                 </Link>
                             </div>
                         </div>

@@ -64,7 +64,9 @@ const ArchiveList = () => {
             (<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
               {archive.length === 0 && <p>No Newsletter found.</p>}
                 {archive.map(newsletter => (
-                    <Card key={newsletter.uuid} className="bg-card border-border overflow-hidden group flex flex-col transform transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2">
+                    <Card key={newsletter.uuid} 
+                    className="bg-card border-border overflow-hidden group flex flex-col transform transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 p-0 m-0"
+                    >
                         <div className="overflow-hidden">
                           <Image
                               src={newsletter.thumbnail ?? "https://www.geoface.com/wp-content/themes/u-design/assets/images/placeholders/post-placeholder.jpg"}

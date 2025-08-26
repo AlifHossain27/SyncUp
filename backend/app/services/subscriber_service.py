@@ -59,3 +59,7 @@ def delete_subscriber(uuid: UUID, db: Session):
     db.commit()
 
     return {"success": True, "message": f"Subscriber with UID {uuid} deleted successfully"}
+
+def retrieve_all_emails(db: Session) -> list[str]:
+    emails = db.query(Subscriber.email).all()
+    return [email[0] for email in emails]
