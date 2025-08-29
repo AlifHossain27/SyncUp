@@ -55,7 +55,7 @@ const NewsLetterEditorPage = () => {
 
         setIsPublishing(true);
         try {
-            const content = await editor.blocksToHTMLLossy(editor.document);
+            const content = await editor.blocksToFullHTML(editor.document);
 
             const resp = await create_newsletter(title, content, title.toLowerCase().replace(/\s+/g, "-"), coverUrl, "published")
            if (resp.ok){

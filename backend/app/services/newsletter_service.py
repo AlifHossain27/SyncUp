@@ -6,6 +6,7 @@ from typing import List
 from datetime import datetime, timezone
 from app.core.config import settings
 from app.services.subscriber_service import retrieve_all_emails
+from app.services.newsletter_styling import make_email_safe_html
 from app.schemas.newsletter_schemas import NewsletterCreate, NewsletterUpdate, NewsletterSchema
 from app.models.newsletter_model import Newsletter
 from app.exceptions.handler import (
@@ -76,18 +77,7 @@ def delete_newsletter(uuid: UUID, db: Session) -> None:
     return None
 
 def send_email(subject: str, html_content: str, recipients: List[str]):
-    wrapped_html = f"""
-    <html>
-        <head></head>
-        <body style="margin:0; padding:0; background-color:#ffefef;">
-            <div style="background-color:#ffefef; padding: 20px;">
-                {html_content}
-            </div>
-        </body>
-    </html>
-    """
-    print("📨 Sending emails . . .")
-
+    wrapped_html = make_email_safe_html(html_content)
     try:
         with smtplib.SMTP(settings.SMTP_SERVER, settings.SMTP_PORT) as server:
             server.starttls()

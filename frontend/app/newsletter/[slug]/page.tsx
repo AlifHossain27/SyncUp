@@ -47,7 +47,7 @@ const NewsletterViewPage: React.FC = () => {
       </h1>
 
       {initialContent ? (
-        <article className="bg-white dark:bg-[#0b0b0b] sm:p-6">
+        <article className="bg-white dark:bg-[#0b0b0b] ">
           <div
             className="
               prose 

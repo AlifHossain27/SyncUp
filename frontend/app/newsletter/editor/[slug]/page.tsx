@@ -72,7 +72,7 @@ const NewsLetterUpdatePage = () => {
     
             setIsPublishing(true);
             try {
-                const content = await editor.blocksToHTMLLossy(editor.document);
+                const content = await editor.blocksToFullHTML(editor.document);
                 const new_slug = title.toLowerCase().replace(/\s+/g, "-")
                 const resp = await update_newsletter(title, content, new_slug, coverUrl, "published", slug)
                if (resp.ok){
