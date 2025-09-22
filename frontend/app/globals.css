@@ -277,11 +277,6 @@
     color: var(--bn-colors-editor-text);
   }
 
-  .prose h4, .prose h5, .prose h6,
-  .bn-block-column h4, .bn-block-column h5, .bn-block-column h6 {
-    font-size: clamp(0.95rem, 2.4vw, 1rem);
-    color: var(--bn-colors-editor-text);
-  }
 
   /* code/pre wrapping */
   .prose pre, pre {

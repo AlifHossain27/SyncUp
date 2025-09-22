@@ -1,4 +1,18 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+export async function get_subscriber(){
+    const resp = await fetch(`${API_BASE_URL}/api/subscribers/`,{
+        method: 'GET',
+        headers: {'Content-Type':'application/json'},
+        credentials: 'include',
+    })
+    const data = await resp.json();
+    return {
+        ok: resp.ok,
+        status: resp.status,
+        body: data,
+    };
+}
+
 export async function add_subscriber(first_name: string, last_name: string, email: string, department: string){
     const resp = await fetch(`${API_BASE_URL}/api/subscriber/create/`,{
         method: 'POST',
@@ -53,6 +67,30 @@ export async function delete_subscriber(uuid: string){
             console.warn("No JSON to parse:", e);
         }
     }
+    return {
+        ok: resp.ok,
+        status: resp.status,
+        body: data,
+    };
+}
+
+export async function uploadSubscribersFile(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/subscriber/upload/`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+    });
+
+    let data = null;
+    try {
+        data = await resp.json();
+    } catch (e) {
+        console.warn("No JSON returned from upload:", e);
+    }
+
     return {
         ok: resp.ok,
         status: resp.status,

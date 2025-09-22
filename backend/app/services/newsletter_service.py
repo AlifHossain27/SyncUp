@@ -23,8 +23,8 @@ def create_newsletter(newsletter: NewsletterCreate, db: Session) -> NewsletterSc
         raise ConflictException(f"Newsletter with title {newsletter.title} already exists")
     db_newsletter = Newsletter(**newsletter.model_dump())
     if newsletter.status == "published":
-        send_email(subject=newsletter.title, html_content=newsletter.content, recipients=retrieve_all_emails(db=db))
         db_newsletter.published_at = datetime.now(tz = timezone.utc)
+        send_email(thumbnail=newsletter.thumbnail, subject=newsletter.title, html_content=newsletter.content, slug=newsletter.slug, published_at=db_newsletter.published_at, recipients=retrieve_all_emails(db=db))
 
 
     db.add(db_newsletter)
@@ -60,8 +60,9 @@ def update_newsletter(slug: str, newsletter: NewsletterUpdate, db: Session) -> N
     db_newsletter.status = newsletter.status
 
     if newsletter.status == "published" and db_newsletter.published_at is None:
-        send_email(subject=newsletter.title, html_content=newsletter.content, recipients=retrieve_all_emails(db=db))
         db_newsletter.published_at = datetime.now(tz = timezone.utc)
+        send_email(thumbnail=newsletter.thumbnail, subject=newsletter.title, html_content=newsletter.content, slug=newsletter.slug, published_at=db_newsletter.published_at, recipients=retrieve_all_emails(db=db))
+        
 
     db.commit()
     db.refresh(db_newsletter)
@@ -76,8 +77,31 @@ def delete_newsletter(uuid: UUID, db: Session) -> None:
     db.commit()
     return None
 
-def send_email(subject: str, html_content: str, recipients: List[str]):
-    wrapped_html = make_email_safe_html(html_content)
+def send_email(thumbnail: str, subject: str, html_content: str, slug: str, published_at: datetime, recipients: List[str]):
+    pub_date_str = published_at.strftime("%B %d, %Y") if published_at else ""
+
+    header_html = f"""
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:20px;">
+      <tr>
+        <td style="text-align:left; width:50%;"></td>
+        <td style="text-align:right; width:50%; font-size:12px; color:#777;">
+          {pub_date_str}
+          {f' | <a href="{settings.FRONTEND_URL}/newsletter/{slug}" style="color:#0b6e99; text-decoration:none;">Read Online</a>' if slug else ""}
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align:center; padding-top:15px;">
+          <h1 style="font-size:24px; font-weight:bold; margin:0; color:#333;">{subject}</h1>
+          {f'<img src="{thumbnail}" alt="Thumbnail" style="max-width:100%; height:auto; border-radius:6px; margin-top:12px;" />' if thumbnail else ""}
+        </td>
+      </tr>
+    </table>
+    """
+
+
+    full_html = header_html + html_content
+
+    wrapped_html = make_email_safe_html(full_html)
     try:
         with smtplib.SMTP(settings.SMTP_SERVER, settings.SMTP_PORT) as server:
             server.starttls()

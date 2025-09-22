@@ -1,6 +1,6 @@
 import traceback
 from uuid import UUID
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.orm import Session
 from app.db.deps import get_db
 from app.schemas.subscriber_schemas import SubscriberCreate, SubscriberSchema
@@ -9,7 +9,8 @@ from app.services.subscriber_service import (
     update_subscriber,
     retrieve_subscribers,
     retrieve_subscriber_by_uuid,
-    delete_subscriber
+    delete_subscriber,
+    process_subscribers_upload
 )
 from app.services.user_service import CurrentUser, get_current_user
 from app.schemas.user_schemas import TokenData
@@ -72,3 +73,15 @@ async def delete_subscriber_route(uuid: UUID, db: Session = Depends(get_db), cur
         print(traceback.format_exc())
         raise BadRequestException()
         
+@subscriber_router.post("/subscriber/upload/", status_code=201)
+async def upload_subscribers_route(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(get_current_user),
+):
+    try:
+        return await process_subscribers_upload(file=file, db=db)
+    except Exception:
+        db.rollback()
+        print(traceback.format_exc())
+        raise BadRequestException("Failed to process file")

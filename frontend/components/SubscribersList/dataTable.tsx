@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import AddSubscriber from './AddSubscriber'
+import UploadFile from './UploadFile'
 
 
 interface DataTableProps<TData, TValue> {
@@ -66,7 +67,10 @@ export function DataTable<TData, TValue>({
               onChange={(event) => setFilterValue(event.target.value)}
               className="w-auto"
             />
+            <div className='flex gap-4'>
             <AddSubscriber/>
+            {table.getRowModel().rows.length === 0 && <UploadFile />}
+            </div>
           </div>
         <div className="rounded-md border-2 shadow-md">
           <Table>
