@@ -81,13 +81,39 @@ def get_current_user(token: Annotated[str, Depends(get_token_from_cookie)]) -> T
 CurrentUser = Annotated[TokenData, Depends(get_current_user)]
 
 def login_user(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session) -> Token:
-    user = authenticate_user(data.username, data.password, db)
-    if not user:
-        raise UnauthorizedException()
+    # Check if there are no users in the DB
+    has_user = db.query(User).first()
+
+    # If DB is empty, and login matches ADMIN credentials → auto-register admin
+    if not has_user and data.username == settings.ADMIN_EMAIL and data.password == settings.ADMIN_PASSWORD:
+        from uuid import uuid4
+        admin_user = User(
+            uuid=uuid4(),
+            username=settings.ADMIN_USERNAME,
+            email=settings.ADMIN_EMAIL,
+            password=get_password_hash(settings.ADMIN_PASSWORD)
+        )
+        db.add(admin_user)
+        db.commit()
+        db.refresh(admin_user)
+        user = admin_user
+    else:
+        # Normal authentication
+        user = authenticate_user(data.username, data.password, db)
+        if not user:
+            raise UnauthorizedException("Authentication Failed! Wrong email or password")
+
+    # Create JWT token
     token = create_access_token(user.email, user.uuid, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     return Token(access_token=token, token_type='bearer')
 
+
 def get_user_by_uuid(uuid: UUID, db: Session) -> UserSchema:
+    if isinstance(uuid, str):
+        try:
+            uuid = UUID(uuid)
+        except ValueError:
+            raise BadRequestException("Invalid UUID")
     user = db.query(User).filter(User.uuid == uuid).first()
     if not user:
         raise NotFoundException(f"User with ID {uuid} not found")

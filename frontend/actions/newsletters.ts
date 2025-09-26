@@ -69,8 +69,8 @@ export async function get_draft_newsletters() {
     };
 }
 
-export async function get_archive_newsletters() {
-    const resp = await fetch(`${API_BASE_URL}/api/newsletters/archive/`, {
+export async function get_archive_newsletters(page: number, limit: number = 6) {
+    const resp = await fetch(`${API_BASE_URL}/api/newsletters/archive/?skip=${page * limit}&limit=${limit}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

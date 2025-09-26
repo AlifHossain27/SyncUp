@@ -1,6 +1,7 @@
 import traceback
 from typing import Annotated
 from uuid import UUID
+from app.core.config import settings
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -46,9 +47,9 @@ async def login_route(response: Response, data: Annotated[OAuth2PasswordRequestF
             key="access_token",
             value=token.access_token,
             httponly=True,
-            secure=False,
+            secure=True,
             samesite="lax",
-            max_age=60 * 60 * 24,
+            max_age=60 * settings.ACCESS_TOKEN_EXPIRE_MINUTES,
             path="/",
         )
         return token
@@ -76,7 +77,7 @@ async def get_current_user_route(current_user: CurrentUser, db: Session = Depend
         print(traceback.format_exc())
         raise BadRequestException()
     
-@user_router.patch("/user/me/", response_model=UserUpdate, status_code=201)
+@user_router.patch("/user/me", response_model=UserSchema, status_code=201)
 async def update_user_route(current_user: CurrentUser, user: UserUpdate, db: Session = Depends(get_db)):
     try:
         uuid = current_user.get_uuid()
@@ -89,5 +90,11 @@ async def update_user_route(current_user: CurrentUser, user: UserUpdate, db: Ses
     
 @user_router.patch("/user/change-password", status_code=200)
 async def change_password_route(new_password: PasswordChange, current_user: CurrentUser, db: Session = Depends(get_db)):
-    change_password(current_user=current_user, new_password=new_password, db=db)
-
+    try:
+        change_password(current_user=current_user, new_password=new_password, db=db)
+        return {"detail": "Password changed successfully"}
+    except (NotFoundException, ConflictException, BadRequestException, UnauthorizedException) as error:
+        raise error
+    except Exception:
+        print(traceback.format_exc())
+        raise BadRequestException()

@@ -44,8 +44,15 @@ def retrieve_draft_newsletters(db: Session) -> NewsletterSchema:
     drafts = db.query(Newsletter).filter(Newsletter.status == "draft").all()
     return drafts
 
-def retrieve_archive_newsletters(db: Session) -> NewsletterSchema:
-    archive = db.query(Newsletter).filter(Newsletter.status == "published").order_by(desc(Newsletter.published_at)).all()
+def retrieve_archive_newsletters(db: Session, skip: int = 0, limit: int = 10) -> List[NewsletterSchema]:
+    archive = (
+        db.query(Newsletter)
+        .filter(Newsletter.status == "published")
+        .order_by(desc(Newsletter.published_at))
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
     return archive
 
 def update_newsletter(slug: str, newsletter: NewsletterUpdate, db: Session) -> NewsletterSchema:
@@ -90,7 +97,7 @@ def send_email(thumbnail: str, subject: str, html_content: str, slug: str, publi
         </td>
       </tr>
       <tr>
-        <td colspan="2" style="text-align:center; padding-top:15px;">
+        <td colspan="2" style="text-align:left; padding-top:15px;">
           <h1 style="font-size:24px; font-weight:bold; margin:0; color:#333;">{subject}</h1>
           {f'<img src="{thumbnail}" alt="Thumbnail" style="max-width:100%; height:auto; border-radius:6px; margin-top:12px;" />' if thumbnail else ""}
         </td>

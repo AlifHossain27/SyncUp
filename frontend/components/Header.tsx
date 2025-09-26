@@ -6,42 +6,56 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu, Bot } from 'lucide-react';
 import { toast } from "sonner"
+import { useDispatch } from 'react-redux'
+import { AppDispatch, useAppSelector } from '@/redux/store'
+import { logIn, logOut } from '@/redux/features/auth-slice'
 
 const Header = () => {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
+  const isAuth = useAppSelector((state) => state.auth.isAuthenticated)
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const logout = async() => {
-        await fetch(`${API_BASE_URL}/api/auth/logout/`,{
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          credentials: 'include'
-        })
-        toast("Logged out",)
-        localStorage.removeItem('isLoggedIn');
-        setIsLoggedIn(false);
-        setIsSheetOpen(false);
-        await router.refresh()
-        await router.push('/')
-      }
+  const logout = async () => {
+    await fetch(`${API_BASE_URL}/api/auth/logout/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    })
+    toast("Logged out")
+    dispatch(logOut())
+    setIsSheetOpen(false)
+    router.push('/')
+  }
+
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    setIsLoggedIn(loggedIn);
-  }, []);
+    (async () => {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/user/me/`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        })
+        if (resp.ok) {
+          dispatch(logIn())
+        } else {
+          dispatch(logOut())
+        }
+      } catch {
+        console.log('connection failed')
+      }
+    })()
+  }, [dispatch, API_BASE_URL])
 
   const navLinks = [
     { href: '/newsletter/', label: 'Newsletters' },
@@ -54,7 +68,7 @@ const Header = () => {
     { href: '/profile/', label: 'Profile' },
   ];
 
-  const linksToShow = isLoggedIn ? adminNavLinks : navLinks;
+  const linksToShow = isAuth ? adminNavLinks : navLinks;
 
   return (
     <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-sm border-b border-border' : 'bg-transparent'}`}>
@@ -69,7 +83,7 @@ const Header = () => {
               {link.label}
             </Link>
           ))}
-          {isLoggedIn && (
+          {isAuth && (
             <Button variant="destructive" className="text-sm" onClick={logout}>
               Logout
             </Button>
@@ -95,7 +109,7 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
-                {isLoggedIn && (
+                {isAuth && (
                   <Button variant="destructive" className="text-sm" onClick={logout}>
                     Logout
                   </Button>

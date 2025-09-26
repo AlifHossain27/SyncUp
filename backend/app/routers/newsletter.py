@@ -54,9 +54,9 @@ async def get_draft_newsletters_route(db: Session = Depends(get_db), current_use
         raise BadRequestException()
 
 @newsletter_router.get("/newsletters/archive/", response_model=List[NewsletterSchema], status_code=200)
-async def get_archive_newsletters_route(db: Session = Depends(get_db)):
+async def get_archive_newsletters_route(skip: int = 0, limit: int = 6, db: Session = Depends(get_db)):
     try:
-        return retrieve_archive_newsletters(db=db)
+        return retrieve_archive_newsletters(db=db, skip=skip, limit=limit)
     except Exception as e:
         print(traceback.format_exc())
         raise BadRequestException()

@@ -62,8 +62,8 @@
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.645 0.246 16.439);
-  --primary-foreground: oklch(0.969 0.015 12.422);
+  --primary: oklch(0.705 0.213 47.604);
+  --primary-foreground: oklch(0.98 0.016 73.684);
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.967 0.001 286.375);
@@ -73,7 +73,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.645 0.246 16.439);
+  --ring: oklch(0.705 0.213 47.604);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -81,57 +81,13 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.645 0.246 16.439);
-  --sidebar-primary-foreground: oklch(0.969 0.015 12.422);
+  --sidebar-primary: oklch(0.705 0.213 47.604);
+  --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
   --sidebar-accent: oklch(0.967 0.001 286.375);
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.645 0.246 16.439);
-}
+  --sidebar-ring: oklch(0.705 0.213 47.604);
 
-.dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.645 0.246 16.439);
-  --primary-foreground: oklch(0.969 0.015 12.422);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.645 0.246 16.439);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.645 0.246 16.439);
-  --sidebar-primary-foreground: oklch(0.969 0.015 12.422);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.645 0.246 16.439);
-}
-/* ---------- end preserved block ---------- */
-
-
-/* =========================
-   --- ADDED BELOW THIS LINE ---
-   (these rules are appended; nothing above was changed)
-   ========================= */
-
-/* BlockNote highlight tokens (from docs you shared) */
-:root {
   --bn-colors-editor-text: #3f3f3f;
   --bn-colors-editor-background: #ffffff;
   --bn-colors-menu-text: #3f3f3f;
@@ -175,36 +131,74 @@
   --bn-border-radius: 6px;
 }
 
-/* conservative dark-mode tweaks for the bn tokens */
 .dark {
-  --bn-colors-editor-text: #e6e6e6;
-  --bn-colors-editor-background: #0b0b0b;
-  --bn-colors-menu-text: #e6e6e6;
-  --bn-colors-menu-background: #111111;
-  --bn-colors-tooltip-text: #e6e6e6;
-  --bn-colors-tooltip-background: #1a1a1a;
-  --bn-colors-hovered-text: #e6e6e6;
-  --bn-colors-hovered-background: #1a1a1a;
-  --bn-colors-selected-text: #0b0b0b;
-  --bn-colors-selected-background: #e6e6e6;
-  --bn-colors-disabled-text: #8b8b8b;
-  --bn-colors-disabled-background: #222222;
+  --background: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.646 0.222 41.116);
+  --primary-foreground: oklch(0.98 0.016 73.684);
+  --secondary: oklch(0.274 0.006 286.033);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.646 0.222 41.116);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.21 0.006 285.885);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.646 0.222 41.116);
+  --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
+  --sidebar-accent: oklch(0.274 0.006 286.033);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.646 0.222 41.116);
 }
 
-/* Ensure .xl-multi-column helper remains a grid by default */
+
+/* Universal highlight handling for all blocks */
+[data-text-color] {
+  font-weight: 600;
+  color: inherit !important;
+}
+
+[data-text-color="pink"] { color: var(--bn-colors-highlights-pink-text) !important; }
+[data-text-color="purple"] { color: var(--bn-colors-highlights-purple-text) !important; }
+[data-text-color="blue"] { color: var(--bn-colors-highlights-blue-text) !important; }
+[data-text-color="green"] { color: var(--bn-colors-highlights-green-text) !important; }
+[data-text-color="brown"] { color: var(--bn-colors-highlights-brown-text) !important; }
+[data-text-color="red"] { color: var(--bn-colors-highlights-red-text) !important; }
+[data-text-color="orange"] { color: var(--bn-colors-highlights-orange-text) !important; }
+[data-text-color="yellow"] { color: var(--bn-colors-highlights-yellow-text) !important; }
+[data-text-color="gray"] { color: var(--bn-colors-highlights-gray-text) !important; }
+
+/* fallback */
+[data-text-color]:not([data-text-color="pink"]):not([data-text-color="purple"]):not([data-text-color="blue"]):not([data-text-color="green"]):not([data-text-color="brown"]):not([data-text-color="red"]):not([data-text-color="orange"]):not([data-text-color="yellow"]):not([data-text-color="gray"]) {
+  color: var(--bn-colors-editor-text) !important;
+}
+
+/* ---------------------
+   Other styles (multi-column, prose, images, headings)
+   --------------------- */
 .xl-multi-column {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1rem;
 }
 
-/* Tailwind base layer + responsive & BlockNote fixes */
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
+  * { @apply border-border outline-ring/50; }
 
-  /* match body colors to BlockNote editor tokens to improve parity */
   body {
     background: var(--bn-colors-editor-background);
     color: var(--bn-colors-editor-text);
@@ -212,7 +206,6 @@
     @apply bg-background text-foreground;
   }
 
-  /* fluid images and overrides for hard width attributes */
   .prose img,
   .bn-block-column img,
   img[data-url],
@@ -229,17 +222,16 @@
     width: auto !important;
   }
 
-  /* respect BlockNote alignment metadata */
   [data-text-alignment="center"] { text-align: center; }
   [data-text-alignment="right"]  { text-align: right; }
   [data-text-alignment="left"]   { text-align: left; }
   [data-text-alignment="justify"]{ text-align: justify; }
 
-  /* make bn column-lists responsive (force grid) */
-  .bn-block-column-list {
+  .bn-block-column-list,
+  .xl-multi-column {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
-    gap: 1rem !important;
+    gap: 0.05rem !important;
     width: 100%;
     box-sizing: border-box;
   }
@@ -249,9 +241,7 @@
     box-sizing: border-box;
   }
 
-  /* responsive headings (keeps sizes you wanted) */
-  .prose h1,
-  .bn-block-column h1 {
+  .prose h1, .bn-block-column h1 {
     font-size: clamp(1.6rem, 4.8vw, 2.8rem);
     line-height: 1.08;
     margin-top: 0.85em;
@@ -260,25 +250,6 @@
     color: var(--bn-colors-editor-text);
   }
 
-  .prose h2,
-  .bn-block-column h2 {
-    font-size: clamp(1.25rem, 3.6vw, 2.0rem);
-    line-height: 1.12;
-    margin-top: 0.75em;
-    margin-bottom: 0.45em;
-    font-weight: 700;
-    color: var(--bn-colors-editor-text);
-  }
-
-  .prose h3,
-  .bn-block-column h3 {
-    font-size: clamp(1.05rem, 3.0vw, 1.5rem);
-    line-height: 1.15;
-    color: var(--bn-colors-editor-text);
-  }
-
-
-  /* code/pre wrapping */
   .prose pre, pre {
     overflow: auto;
     white-space: pre-wrap;
@@ -288,137 +259,18 @@
   .prose a { word-break: break-word; }
 }
 
-/* Map BlockNote data-text-color to the bn tokens (high specificity) */
-.prose [data-text-color],
-.bn-block-column [data-text-color],
-[data-text-color] {
-  opacity: 1 !important;
-  color: inherit; /* fallback; specific mappings follow */
-  font-weight: 600;
-  text-decoration-skip-ink: none;
-}
-
-/* explicit highlight mappings using your token values */
-.prose [data-text-color="pink"],
-.bn-block-column [data-text-color="pink"],
-[data-text-color="pink"] {
-  color: var(--bn-colors-highlights-pink-text) !important;
-}
-
-.prose [data-text-color="purple"],
-.bn-block-column [data-text-color="purple"],
-[data-text-color="purple"] {
-  color: var(--bn-colors-highlights-purple-text) !important;
-}
-
-.prose [data-text-color="blue"],
-.bn-block-column [data-text-color="blue"],
-[data-text-color="blue"] {
-  color: var(--bn-colors-highlights-blue-text) !important;
-}
-
-.prose [data-text-color="green"],
-.bn-block-column [data-text-color="green"],
-[data-text-color="green"] {
-  color: var(--bn-colors-highlights-green-text) !important;
-}
-
-.prose [data-text-color="brown"],
-.bn-block-column [data-text-color="brown"],
-[data-text-color="brown"] {
-  color: var(--bn-colors-highlights-brown-text) !important;
-}
-
-.prose [data-text-color="red"],
-.bn-block-column [data-text-color="red"],
-[data-text-color="red"] {
-  color: var(--bn-colors-highlights-red-text) !important;
-}
-
-.prose [data-text-color="orange"],
-.bn-block-column [data-text-color="orange"],
-[data-text-color="orange"] {
-  color: var(--bn-colors-highlights-orange-text) !important;
-}
-
-.prose [data-text-color="yellow"],
-.bn-block-column [data-text-color="yellow"],
-[data-text-color="yellow"] {
-  color: var(--bn-colors-highlights-yellow-text) !important;
-}
-
-.prose [data-text-color="gray"],
-.bn-block-column [data-text-color="gray"],
-[data-text-color="gray"] {
-  color: var(--bn-colors-highlights-gray-text) !important;
-}
-
-/* fallback to editor text color for unknown tokens */
-[data-text-color]:not([data-text-color="pink"]):not([data-text-color="purple"]):not([data-text-color="blue"]):not([data-text-color="green"]):not([data-text-color="brown"]):not([data-text-color="red"]):not([data-text-color="orange"]):not([data-text-color="yellow"]):not([data-text-color="gray"]) {
-  color: var(--bn-colors-editor-text) !important;
-}
-
-/* ensure colored spans inside headings behave */
-.prose h1 span[data-text-color],
-.prose h2 span[data-text-color],
-.bn-block-column h1 span[data-text-color],
-.bn-block-column h2 span[data-text-color] {
-  color: inherit !important;
-}
-
-/* Column responsiveness safety */
-.bn-block-column-list,
-.bn-block-column-list[style],
-.bn-block-column-list[style*="display:flex"] {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
-  gap: 1rem !important;
-  align-items: start;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.bn-block-column {
-  width: 100% !important;
-  box-sizing: border-box;
-}
-
-.xl-multi-column,
-.xl-multi-column[style],
-.xl-multi-column[style*="display:flex"] {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
-  gap: 1rem !important;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* small screens: stack */
+/* Small screen stacking */
 @media (max-width: 640px) {
   .bn-block-column-list,
-  .xl-multi-column {
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
-  }
+  .xl-multi-column { grid-template-columns: 1fr !important; gap: 0.75rem !important; }
 
-  /* kill column-side spacing on mobile */
-  .bn-block-column {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
+  .bn-block-column { margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
 
-  /* make sure children don’t reintroduce weird offset */
-  .bn-block-column > * {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
+  .bn-block-column > * { margin-left: 0 !important; margin-right: 0 !important; }
 }
 
-/* if flex stays, allow wrapping */
-.bn-block-column-list[style*="display:flex"],
-.xl-multi-column[style*="display:flex"] {
-  flex-wrap: wrap !important;
-  gap: 1rem !important;
+.bn-block:empty::before,
+p:empty::before {
+  content: "\00a0"; /* non-breaking space */
+  white-space: pre;
 }
