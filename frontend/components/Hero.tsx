@@ -9,7 +9,7 @@ const Hero = () => {
       <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 md:px-6">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-2 gap-20 items-center">
           <div className="space-y-6 text-center md:text-left">
              <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
               <Zap className="w-4 h-4 mr-2" />
@@ -32,7 +32,7 @@ const Hero = () => {
               </Button>
             </div>
           </div>
-          <div className="relative group max-w-lg mx-auto">
+          <div className="relative group max-w-lg mx-auto order-first md:order-2">
             <div className="absolute -inset-2 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-lg opacity-60 group-hover:opacity-80 transition duration-500"></div>
              <Image 
                 src="https://www.bracucc.org/_next/static/media/bucc-icon.f845a68c.svg" 
