@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from io import BytesIO
+from sqlalchemy import extract, func
 from sqlalchemy.orm import Session
 from uuid import UUID
 from datetime import datetime, timezone
@@ -118,3 +119,31 @@ async def process_subscribers_upload(file: UploadFile, db: Session):
     finally:
         if os.path.exists(file_path):
             os.remove(file_path)
+
+def get_subscriber_growth(db: Session, year: int):
+    """
+    Returns number of subscribers grouped by month for a given year.
+    """
+    results = (
+        db.query(
+            extract('month', Subscriber.created_at).label("month"),
+            func.count(Subscriber.uuid).label("subscribers")
+        )
+        .filter(func.extract('year', Subscriber.created_at) == year)
+        .group_by("month")
+        .order_by("month")
+        .all()
+    )
+
+    # Convert month number → readable name
+    month_names = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+
+    data = [
+        {"month": month_names[int(month) - 1], "subscribers": subscribers}
+        for month, subscribers in results
+    ]
+
+    return data

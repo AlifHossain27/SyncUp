@@ -10,7 +10,8 @@ from app.services.subscriber_service import (
     retrieve_subscribers,
     retrieve_subscriber_by_uuid,
     delete_subscriber,
-    process_subscribers_upload
+    process_subscribers_upload,
+    get_subscriber_growth
 )
 from app.services.user_service import CurrentUser, get_current_user
 from app.schemas.user_schemas import TokenData
@@ -85,3 +86,11 @@ async def upload_subscribers_route(
         db.rollback()
         print(traceback.format_exc())
         raise BadRequestException("Failed to process file")
+    
+@subscriber_router.get("/subscribers/growth/{year}", status_code=200)
+async def subscriber_growth_route(year: int, db: Session = Depends(get_db)):
+    try:
+        return get_subscriber_growth(db=db, year=year)
+    except Exception as e:
+        print(traceback.format_exc())
+        raise BadRequestException("Failed to fetch growth data")
