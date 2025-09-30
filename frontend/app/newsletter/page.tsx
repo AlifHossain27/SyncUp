@@ -1,19 +1,16 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ArchiveList from '@/components/ArchiveList'
 import DraftList from '@/components/DraftList';
+import { useAppSelector } from '@/redux/store'
 
 
 const NewslettersPage = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  useEffect(() => {
-      const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      setIsLoggedIn(loggedIn);
-    }, []);
+  const isAuth = useAppSelector((state) => state.auth.isAuthenticated)
 
   return (
     <div>
-      {isLoggedIn && (
+      {isAuth && (
         <DraftList/> 
       )}
       <ArchiveList/>
