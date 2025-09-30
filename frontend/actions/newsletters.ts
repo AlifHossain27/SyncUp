@@ -103,3 +103,18 @@ export async function delete_newsletter(uuid: string) {
     body: data,
   };
 }
+
+export async function get_subscriber_growth(year: number) {
+  const resp = await fetch(`${API_BASE_URL}/api/subscribers/growth/${year}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  });
+
+  const data = await resp.json();
+  return {
+    ok: resp.ok,
+    status: resp.status,
+    body: data,
+  };
+}

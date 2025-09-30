@@ -2,7 +2,7 @@ import { Quote } from 'lucide-react';
 
 const QuoteBlock = () => {
     return (
-        <section className="py-20 md:py-28 bg-card">
+        <section className="py-20 md:py-28 bg-[#f8f8f8]">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="max-w-3xl mx-auto text-center">
                     <Quote className="h-12 w-12 text-accent mx-auto mb-6" />

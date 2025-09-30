@@ -33,7 +33,7 @@ const chartConfig = {
 
 const DataChart = () => {
   return (
-     <section id="data" className="py-20 md:py-28 bg-[#f8f8f8]">
+     <section id="data" className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 md:px-6">
             <div className="text-center space-y-4 mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold font-headline text-foreground">Community Growth</h2>

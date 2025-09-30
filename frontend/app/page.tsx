@@ -13,7 +13,6 @@ export default function Home() {
       
       <main className="flex-grow">
         <Hero/>
-        <FeaturedStory/>
         <RecentContent/>
         <DataChart/>
         <SubscriptionAim/>
