@@ -5,19 +5,26 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter } from 'next/navigation'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner"
 import { CheckCircle } from 'lucide-react';
+import { add_subscriber } from "@/actions/subscribers";
 
 const formSchema = z.object({
     firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
     lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
     department: z.string().min(2, { message: "Department must be at least 2 characters." }),
-    email: z.string().email({ message: "Please enter a valid email address." }),
+    email: z
+        .string()
+        .email({ message: "Please enter a valid email address." })
+        .refine((val) => val.endsWith("@g.bracu.ac.bd"), {
+            message: "Email must end with @g.bracu.ac.bd",
+        }),
 });
 
 const SubscriptionAim = () => {
-
+    const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -28,14 +35,22 @@ const SubscriptionAim = () => {
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
-        toast("Subscribed!");
-        form.reset();
-    }
+    async function onSubmit(values: z.infer<typeof formSchema>){
+            const resp = await add_subscriber(values.firstName, values.lastName, values.email, values.department)
+            if (resp.ok){
+                await router.refresh()
+                await form.reset();
+                toast("Successfully Subscribered",)
+            } else {  
+                toast.error(
+                    `${resp.body?.detail} (Status ${resp.status})`
+                );
+                await router.refresh()
+            }
+        }
     
     return (
-        <section id="subscribe" className="py-20 md:py-28 bg-background">
+        <section id="subscribe" className="py-20 md:py-28 bg-[#f8f8f8]">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6">

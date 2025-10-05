@@ -1,11 +1,10 @@
 "use client";
-
-import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, MapPin, Clock } from 'lucide-react';
 import { ImSpinner2 } from "react-icons/im";
 import { get_recent_event, get_upcoming_event } from '@/actions/events';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 
 type Event = {
@@ -22,34 +21,45 @@ type Event = {
 
 
 const EventList = () => {
-    const [recent, setRecent] = useState<Event[]>([])
-    const [upcoming, setUpcoming] = useState<Event[]>([])
-    const [loading, setLoading] = useState(true);
+  const { data: upcomingEvents, isLoading: loadingUpcoming } = useQuery({
+    queryFn: get_upcoming_event,
+    queryKey: ['upcomingEvents']
+  });
 
-    useEffect(() => {
-        async function fetchDrafts() {
-            const resp1 = await get_upcoming_event()
-            const resp2 = await get_recent_event()
-            if (resp1.ok) {
-                setUpcoming(resp1.body);
-                console.log(resp1)
-            } else {
-                console.log(resp1.body)
-            }
-            if (resp2.ok) {
-                setRecent(resp2.body);
-                console.log(resp2)
-            } else {
-                console.log(resp2.body)
-            }
-            setLoading(false);
-            }
-            fetchDrafts();
-    }, []);
+  const fetchRecent = async ({ pageParam = 0 }) => {
+      const limit = 3;
+      const resp = await get_recent_event(pageParam, limit);
+      if (!resp.ok) throw new Error("Failed to load Archive");
 
-    if (loading) return (<div className='pt-20 flex justify-center'>
-                <ImSpinner2 className="animate-spin" size="50" />
-            </div>);
+      return {
+        newsletters: resp.body,
+        nextPage: resp.body.length === limit ? pageParam + 1 : undefined,
+      };
+    };
+
+    const {
+      data,
+      error,
+      fetchNextPage,
+      hasNextPage,
+      isFetchingNextPage,
+      status,
+    } = useInfiniteQuery({
+      queryKey: ["recentEvents"],
+      queryFn: fetchRecent,
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+    });
+
+    const recentEvents = data?.pages.flatMap((page) => page.newsletters) ?? [];
+
+  if (loadingUpcoming || isFetchingNextPage) {
+    return (
+      <div className="pt-20 flex justify-center">
+        <ImSpinner2 className="animate-spin" size="50" />
+      </div>
+    );
+  }
 
     const EventCard = ({ event }: { event: Event }) => (
       <Card className="bg-card border-border flex flex-col group transform transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1">
@@ -102,16 +112,50 @@ const EventList = () => {
             <div className="space-y-16">
                 <div>
                     <h3 className="text-2xl font-bold font-headline text-foreground mb-8">Upcoming Events</h3>
-                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {upcoming?.map(event => <EventCard key={event.uuid} event={event} />)}
-                    </div>
+                     {upcomingEvents.length > 0 ? (
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {upcomingEvents.map((event:Event) => (
+                          <EventCard key={event.uuid} event={event} />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">No upcoming events.</p>
+                    )}
                 </div>
+                {status === "pending" ? (
+                  <div className="flex justify-center">
+                    <ImSpinner2 className="animate-spin" size="50" />
+                  </div>
+                ) : status === "error" ? (
+                  <p className="text-center text-red-500">
+                    {(error as Error).message}
+                  </p>
+                ) : (
                  <div>
                     <h3 className="text-2xl font-bold font-headline text-foreground mb-8">Past Events</h3>
-                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {recent?.map(event => <EventCard key={event.uuid} event={event} />)}
-                    </div>
+                     {recentEvents.length > 0 ? (
+                      <div>
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {recentEvents.map((event:Event) => (
+                          <EventCard key={event.uuid} event={event} />
+                        ))}
+                      </div>
+                      {hasNextPage && (
+                          <div className="w-full flex justify-center p-10">
+                            <Button
+                              onClick={() => fetchNextPage()}
+                              disabled={isFetchingNextPage}
+                            >
+                              {isFetchingNextPage ? "Loading more..." : "Load More"}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">No past events.</p>
+                    )}
                 </div>
+                )}
             </div>
           </div>
         </section>

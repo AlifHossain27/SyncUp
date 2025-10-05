@@ -21,10 +21,6 @@ interface Newsletter {
 }
 
 const ArchiveList = () => {
-  
-    const [archive, setArchive] = useState<Newsletter[]>([]);
-    const [loading, setLoading] = useState(true);
-
     const fetchArchives = async ({ pageParam = 0 }) => {
       const limit = 6;
       const resp = await get_archive_newsletters(pageParam, limit);

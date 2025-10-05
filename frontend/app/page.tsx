@@ -1,5 +1,4 @@
 import DataChart from "@/components/CommunityGrowth";
-import FeaturedStory from "@/components/FeaturedStory";
 import Hero from "@/components/Hero";
 import QuoteBlock from "@/components/QuoteBlock";
 import RecentContent from "@/components/RecentContent";

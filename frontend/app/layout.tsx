@@ -5,7 +5,6 @@ import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner"
 import Footer from "@/components/Footer";
 import { AuthProvider } from '@/redux/provider'
-import NextTopLoader from 'nextjs-toploader'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,11 +36,9 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${spaceGrotesk.variable} antialiased`}
       >
-        
         <AuthProvider>
         <main className="flex">
           <div className='flex flex-col w-full'>
-            <NextTopLoader/>
             <Header/>
             <div className='flex-1'>
                 {children}

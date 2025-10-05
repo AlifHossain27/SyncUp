@@ -26,7 +26,7 @@ from app.exceptions.handler import (
 subscriber_router = APIRouter()
 
 @subscriber_router.post("/subscriber/create/", response_model=SubscriberSchema, status_code=201)
-async def create_subscriber_route(subscriber: SubscriberCreate, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+async def create_subscriber_route(subscriber: SubscriberCreate, db: Session = Depends(get_db)):
     try:
         return create_subscriber(subscriber=subscriber, db=db)
     except (NotFoundException, ConflictException, BadRequestException) as error:

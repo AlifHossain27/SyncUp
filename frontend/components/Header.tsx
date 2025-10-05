@@ -59,11 +59,12 @@ const Header = () => {
 
   const navLinks = [
     { href: '/newsletter/', label: 'Newsletters' },
-    { href: '/about', label: 'About Us' },
+    { href: '/events', label: 'Events' },
   ];
 
   const adminNavLinks = [
     { href: '/newsletter/', label: 'Newsletter' },
+    { href: '/events', label: 'Events' },
     { href: '/subscribers/', label: 'Subscribers' },
     { href: '/profile/', label: 'Profile' },
   ];

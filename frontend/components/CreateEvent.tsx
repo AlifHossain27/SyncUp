@@ -22,21 +22,13 @@ import {
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useRouter } from 'next/navigation';
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { create_event } from '@/actions/events'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type Event = {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  location: string;
-  link: string;
-}
 
 const eventFormSchema = z.object({
     title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -55,10 +47,6 @@ const eventFormSchema = z.object({
     const startDateTime = new Date(`${data.date}T${data.startTime}`);
     const endDateTime = new Date(`${data.date}T${data.endTime}`);
     
-    if (endDateTime <= startDateTime) {
-        endDateTime.setDate(endDateTime.getDate() + 1);
-    }
-
     return endDateTime > startDateTime;
 }, {
     message: "End time must be after start time.",
@@ -66,7 +54,7 @@ const eventFormSchema = z.object({
 });
 
 const CreateEvent = () => {
-    const router = useRouter()
+    const queryClient = useQueryClient();
     const form = useForm<z.infer<typeof eventFormSchema>>({
         resolver: zodResolver(eventFormSchema),
         defaultValues: {
@@ -82,30 +70,39 @@ const CreateEvent = () => {
 
     const descriptionWordCount = form.watch('description').split(/\s+/).filter(Boolean).length;
 
-    async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-        const resp = await create_event(
+    const mutation = useMutation({
+        mutationFn: (values: z.infer<typeof eventFormSchema>) =>
+        create_event(
             values.title,
             values.description,
             values.date,
             values.startTime,
             values.endTime,
             values.location,
-            values.link 
-        )
-        if (resp.ok){
-            await router.refresh()
-            await form.reset();
-            toast("Successfully Created Event",)
+            values.link
+        ),
+        onSuccess: (resp) => {
+        if (resp.ok) {
+            toast.success("Successfully Created Event");
+            form.reset();
+            queryClient.invalidateQueries({ queryKey: ["upcomingEvents"] });
+            queryClient.invalidateQueries({ queryKey: ["recentEvents"] });
+
             setTimeout(() => {
-                document.getElementById("dialog-close-button")?.click();
-                }, 50);
-        } else {  
-            toast.error(
-                `${resp.body?.detail} (Status ${resp.status})`
-            );
-            await router.refresh()
+            document.getElementById("dialog-close-button")?.click();
+            }, 50);
+        } else {
+            toast.error(`${resp.body?.detail} (Status ${resp.status})`);
         }
-    }
+        },
+        onError: (error: any) => {
+            toast.error("Something went wrong while creating event");
+        },
+    });
+
+  async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    await mutation.mutate(values);
+  }
   return (
     <Dialog>
         <DialogTrigger asChild>

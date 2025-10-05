@@ -53,15 +53,11 @@ export async function get_upcoming_event(){
         credentials: 'include',
     })
     const data = await resp.json();
-    return {
-        ok: resp.ok,
-        status: resp.status,
-        body: data,
-    };
+    return data
 }
 
-export async function get_recent_event(){
-    const resp = await fetch(`${API_BASE_URL}/api/events/recent/`,{
+export async function get_recent_event(page: number, limit: number = 3){
+    const resp = await fetch(`${API_BASE_URL}/api/events/recent/?skip=${page * limit}&limit=${limit}`,{
         method: "GET",
         headers: {'Content-Type':'application/json'},
         credentials: 'include',
