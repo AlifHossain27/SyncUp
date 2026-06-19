@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
 import { BlockNoteEditor } from '@blocknote/core';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Newspaper } from 'lucide-react';
 import Cover from '@/components/Cover';
 import { create_newsletter } from '@/actions/newsletters';
 

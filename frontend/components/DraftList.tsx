@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { delete_newsletter, get_draft_newsletters } from "@/actions/newsletters";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Edit, Send, Trash2 } from "lucide-react";
+import { PlusCircle, Edit, Send, Trash2, Newspaper } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge"
@@ -102,13 +102,19 @@ const DraftList = () => {
             className="bg-card border-border overflow-hidden group flex flex-col transform transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 p-0 m-0"
           >
             <div className="overflow-hidden relative m-0 p-0">
-              <Image
-                src={newsletter.thumbnail ?? "https://www.geoface.com/wp-content/themes/u-design/assets/images/placeholders/post-placeholder.jpg"}
-                alt={newsletter.title}
-                width={600}
-                height={400}
-                className="w-full h-48 object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 block"
-              />
+              {newsletter.thumbnail ? (
+                <Image
+                  src={newsletter.thumbnail}
+                  alt={newsletter.title}
+                  width={600}
+                  height={400}
+                  className="w-full h-48 object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                />
+              ) : (
+                <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-primary/10 via-muted to-primary/5">
+                  <Newspaper className="h-10 w-10 text-primary/40" />
+                </div>
+              )}
               <Badge
                 variant="secondary"
                 className="absolute top-4 left-4 bg-yellow-400/80 text-yellow-900 backdrop-blur-sm"

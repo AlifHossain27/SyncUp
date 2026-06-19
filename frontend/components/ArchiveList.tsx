@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Image from 'next/image';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import { ImSpinner2 } from "react-icons/im";
-import { toast } from "sonner";
+import { ArrowRight, Inbox, Newspaper } from 'lucide-react';
 import { get_archive_newsletters } from "@/actions/newsletters";
 import Link from "next/link";
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -20,116 +18,146 @@ interface Newsletter {
   published_at: string;
 }
 
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function NewsletterCard({ newsletter }: { newsletter: Newsletter }) {
+  return (
+    <Link href={`/newsletter/${newsletter.slug}`} className="group block h-full">
+      <Card className="h-full flex flex-col overflow-hidden p-0 m-0 border-border/60 bg-card transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1">
+        <div className="relative overflow-hidden w-full h-48">
+          {newsletter.thumbnail ? (
+            <Image
+              src={newsletter.thumbnail}
+              alt={newsletter.title}
+              width={600}
+              height={400}
+              className="w-full h-48 object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-primary/10 via-muted to-primary/5">
+              <Newspaper className="h-10 w-10 text-primary/40" />
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </div>
+
+        <CardContent className="flex-grow p-5 pb-2">
+          <span className="text-xs font-medium tracking-wide uppercase text-muted-foreground">
+            {formatDate(newsletter.published_at)}
+          </span>
+          <CardTitle className="mt-2 font-headline text-lg leading-snug text-foreground transition-colors duration-200 group-hover:text-primary">
+            {newsletter.title}
+          </CardTitle>
+        </CardContent>
+
+        <CardFooter className="p-5 pt-3">
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+            Read newsletter
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+          </span>
+        </CardFooter>
+      </Card>
+    </Link>
+  );
+}
+
+function CardSkeleton() {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card animate-pulse">
+      <div className="h-48 bg-muted" />
+      <div className="p-5 space-y-3">
+        <div className="h-3 w-20 bg-muted rounded" />
+        <div className="h-5 w-3/4 bg-muted rounded" />
+        <div className="h-5 w-1/2 bg-muted rounded" />
+      </div>
+    </div>
+  );
+}
+
 const ArchiveList = () => {
-    const fetchArchives = async ({ pageParam = 0 }) => {
-      const limit = 6;
-      const resp = await get_archive_newsletters(pageParam, limit);
-      if (!resp.ok) throw new Error("Failed to load Archive");
+  const fetchArchives = async ({ pageParam = 0 }) => {
+    const limit = 6;
+    const resp = await get_archive_newsletters(pageParam, limit);
+    if (!resp.ok) throw new Error("Failed to load Archive");
 
-      return {
-        newsletters: resp.body,
-        nextPage: resp.body.length === limit ? pageParam + 1 : undefined,
-      };
+    return {
+      newsletters: resp.body,
+      nextPage: resp.body.length === limit ? pageParam + 1 : undefined,
     };
+  };
 
-    const {
-      data,
-      error,
-      fetchNextPage,
-      hasNextPage,
-      isFetchingNextPage,
-      status,
-    } = useInfiniteQuery({
-      queryKey: ["archive-list"],
-      queryFn: fetchArchives,
-      initialPageParam: 0,
-      getNextPageParam: (lastPage) => lastPage.nextPage,
-    });
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["archive-list"],
+    queryFn: fetchArchives,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+  });
 
-    const allNewsletters = data?.pages.flatMap((page) => page.newsletters) ?? [];
+  const allNewsletters = data?.pages.flatMap((page) => page.newsletters) ?? [];
 
-  
-
-    return (
-        <section id="archive" className="py-10 md:py-18 bg-background">
+  return (
+    <section id="archive" className="py-16 md:py-24 bg-background">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center space-y-4 mb-16">
+        <div className="text-center space-y-4 mb-14">
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+            Archive
+          </span>
           <h2 className="text-4xl md:text-5xl font-bold font-headline text-foreground">
             Newsletter Archive
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Browse through our entire collection of past newsletters. Catch up
-            on any insights you might have missed from the SyncUp community.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Browse our full collection of past newsletters and catch up on
+            any insights you might have missed from the SyncUp community.
           </p>
         </div>
 
         {status === "pending" ? (
-          <div className="flex justify-center">
-            <ImSpinner2 className="animate-spin" size="50" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
           </div>
         ) : status === "error" ? (
-          <p className="text-center text-red-500">
-            {(error as Error).message}
-          </p>
+          <div className="text-center py-12 space-y-2">
+            <p className="text-destructive font-medium">Couldn&apos;t load the archive</p>
+            <p className="text-sm text-muted-foreground">{(error as Error).message}</p>
+          </div>
+        ) : allNewsletters.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
+            <Inbox className="h-10 w-10 text-muted-foreground/50" />
+            <p className="text-muted-foreground">No newsletters yet — check back soon.</p>
+          </div>
         ) : (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 pb-8">
-              {allNewsletters.length === 0 && (
-                <p>No Newsletter found.</p>
-              )}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pb-10">
               {allNewsletters.map((newsletter: Newsletter) => (
-                <Card
-                  key={newsletter.uuid}
-                  className="bg-card border-border overflow-hidden group flex flex-col transform transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 p-0 m-0"
-                >
-                  <div className="overflow-hidden">
-                    <Image
-                      src={
-                        newsletter.thumbnail ??
-                        "https://www.geoface.com/wp-content/themes/u-design/assets/images/placeholders/post-placeholder.jpg"
-                      }
-                      alt={newsletter.title}
-                      width={600}
-                      height={400}
-                      className="w-full h-48 object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                    />
-                  </div>
-                  <CardContent className="p-6 space-y-4 flex-grow">
-                    <CardTitle className="font-headline text-xl text-foreground group-hover:text-primary transition-colors duration-300">
-                      {newsletter.title}
-                    </CardTitle>
-                  </CardContent>
-                  <CardFooter className="p-6 pt-0 flex justify-between items-center text-sm text-muted-foreground">
-                    <span>
-                      {new Date(
-                        newsletter.published_at
-                      ).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                    <Link href={`/newsletter/${newsletter.slug}`}>
-                      <Button
-                        variant="link"
-                        className="p-0 h-auto text-primary group-hover:underline"
-                      >
-                        Read More{" "}
-                        <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
+                <NewsletterCard key={newsletter.uuid} newsletter={newsletter} />
               ))}
             </div>
 
             {hasNextPage && (
               <div className="flex justify-center">
                 <Button
+                  size="lg"
+                  variant="outline"
                   onClick={() => fetchNextPage()}
                   disabled={isFetchingNextPage}
+                  className="rounded-full px-8"
                 >
-                  {isFetchingNextPage ? "Loading more..." : "Load More"}
+                  {isFetchingNextPage ? "Loading more..." : "Load more"}
                 </Button>
               </div>
             )}
@@ -137,6 +165,7 @@ const ArchiveList = () => {
         )}
       </div>
     </section>
-    );
+  );
 };
+
 export default ArchiveList;

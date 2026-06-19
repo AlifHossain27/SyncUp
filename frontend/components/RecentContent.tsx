@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from "sonner";
 import { get_archive_newsletters } from "@/actions/newsletters";
 import Link from "next/link";
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Inbox, Newspaper } from 'lucide-react';
 
 interface Newsletter {
   uuid: string;
@@ -18,7 +18,7 @@ interface Newsletter {
   published_at: string;
 }
 
-const RecentContent = () => {
+const RecentContent = ({ newsletter }: { newsletter: Newsletter }) => {
     const [content, setContent] = useState<Newsletter[]>([]);
 
     
@@ -50,16 +50,19 @@ const RecentContent = () => {
                         className="bg-card border-border overflow-hidden group flex flex-col transform transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 p-0 m-0"
                         >
                         <div className="overflow-hidden">
-                            <Image
-                            src={
-                                newsletter.thumbnail ??
-                                "https://www.geoface.com/wp-content/themes/u-design/assets/images/placeholders/post-placeholder.jpg"
-                            }
-                            alt={newsletter.title}
-                            width={600}
-                            height={400}
-                            className="w-full h-48 object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                            />
+                            {newsletter.thumbnail ? (
+                                <Image
+                                src={newsletter.thumbnail}
+                                alt={newsletter.title}
+                                width={600}
+                                height={400}
+                                className="w-full h-48 object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                                />
+                            ) : (
+                                <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-primary/10 via-muted to-primary/5">
+                                <Newspaper className="h-10 w-10 text-primary/40" />
+                                </div>
+                            )}
                         </div>
                         <CardContent className="p-6 space-y-4 flex-grow">
                             <CardTitle className="font-headline text-xl text-foreground group-hover:text-primary transition-colors duration-300">
