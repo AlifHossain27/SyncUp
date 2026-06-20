@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import subscriber, user, newsletter, event
 from app.db.database import Base, engine
+from app.core.config import settings
 
 app = FastAPI(
     title = "SyncUp",
@@ -17,7 +18,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[settings.FRONTEND_URL],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
