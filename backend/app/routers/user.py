@@ -48,7 +48,7 @@ async def login_route(response: Response, data: Annotated[OAuth2PasswordRequestF
             value=token.access_token,
             httponly=True,
             secure=True,
-            samesite="lax",
+            samesite="none",
             max_age=60 * settings.ACCESS_TOKEN_EXPIRE_MINUTES,
             path="/",
         )

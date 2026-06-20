@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 from app.routers import subscriber, user, newsletter, event
 from app.db.database import Base, engine
 from app.core.config import settings
+from app.core.rate_limiting import limiter
 
 app = FastAPI(
     title = "SyncUp",
@@ -15,6 +18,16 @@ app = FastAPI(
         "email": "alifh044@gmail.com"
     }
 )
+
+app.state.limiter = limiter
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Too many requests. Please try again later."},
+        headers={"Access-Control-Allow-Origin": settings.FRONTEND_URL},
+    )
 
 app.add_middleware(
     CORSMiddleware,
