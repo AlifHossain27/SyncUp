@@ -21,8 +21,38 @@ export function proxy(request: NextRequest) {
     path = path.slice(0, -1);
   }
 
-  // Retrieve the access token from cookies
-  const token = request.cookies.get("access_token")?.value;
+  // Retrieve the access token from cookies (with multiple fallback checks)
+  let token = request.cookies.get("access_token")?.value;
+
+  // Fallback 1: check common prefixed names
+  if (!token) {
+    token = request.cookies.get("__Secure-access_token")?.value || request.cookies.get("__Host-access_token")?.value;
+  }
+
+  // Fallback 2: manually parse the raw Cookie header if Next.js request.cookies is failing
+  if (!token) {
+    const cookieHeader = request.headers.get("cookie");
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(";").map((c) => c.trim());
+      const found = cookies.find(
+        (c) =>
+          c.startsWith("access_token=") ||
+          c.startsWith("__Secure-access_token=") ||
+          c.startsWith("__Host-access_token=")
+      );
+      if (found) {
+        token = found.split("=")[1];
+      }
+    }
+  }
+
+  // Validate that the token is present and is a non-empty/valid session token
+  const hasValidToken =
+    token &&
+    token.trim() !== "" &&
+    token !== "deleted" &&
+    token !== "null" &&
+    token !== "undefined";
 
   // Define public pages: "/", "/events", "/newsletter", and "/newsletter/[slug]"
   const isPublicPage = () => {
@@ -39,8 +69,8 @@ export function proxy(request: NextRequest) {
     return false;
   };
 
-  // 1. If the user is authenticated (has token)
-  if (token) {
+  // 1. If the user is authenticated (has a valid token)
+  if (hasValidToken) {
     // Authenticated users should not be allowed to visit the login page
     if (path === "/login") {
       return NextResponse.redirect(new URL("/", request.url));
