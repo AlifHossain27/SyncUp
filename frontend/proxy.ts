@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   const publicPaths = [
-  '/',
-  '/login',
-  '/events',
-  '/newsletter',
-]
+    '/',
+    '/login',
+    '/events',
+    '/newsletter',
+  ]
 
   const isPublicPath = publicPaths.includes(path)
   const token = request.cookies.get('access_token')?.value || ''
