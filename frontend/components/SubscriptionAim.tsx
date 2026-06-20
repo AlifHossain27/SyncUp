@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from 'next/navigation'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner"
 import { CheckCircle } from 'lucide-react';
 import { add_subscriber } from "@/actions/subscribers";
@@ -58,7 +58,7 @@ const SubscriptionAim = () => {
                             Why SyncUp?
                         </h2>
                         <p className="text-lg text-muted-foreground">
-                            SyncUp is more than just a newsletter; it's a community of innovators, thinkers, and builders from BRAC University Computer Club. We aim to deliver high-quality content that not only informs but also inspires.
+                            SyncUp is more than just a newsletter; it&apos;s a community of innovators, thinkers, and builders from BRAC University Computer Club. We aim to deliver high-quality content that not only informs but also inspires.
                         </p>
                         <ul className="space-y-4">
                             <li className="flex items-center gap-3">

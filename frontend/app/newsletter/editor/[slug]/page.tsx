@@ -13,7 +13,8 @@ import { update_newsletter, get_newsletter } from '@/actions/newsletters';
 const NewsLetterUpdatePage = () => {
     const { slug } = useParams<{ slug: string }>();
     const router = useRouter()
-    const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [editor, setEditor] = useState<BlockNoteEditor<any, any, any> | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
     const [title, setTitle] = useState("");
@@ -30,65 +31,65 @@ const NewsLetterUpdatePage = () => {
     );
 
     useEffect(() => {
-    async function fetchNewsletter() {
-      const resp = await get_newsletter(slug);
-      if (resp.ok) {
-        const data = resp.body;
-        setTitle(data.title);
-        setCoverUrl(data.thumbnail ?? "");
-        setInitialContent(data.content);
-      } else {
-        toast.error("Failed to load newsletter data");
-      }
-    }
-    fetchNewsletter();
-  }, [slug]);
+        async function fetchNewsletter() {
+            const resp = await get_newsletter(slug);
+            if (resp.ok) {
+                const data = resp.body;
+                setTitle(data.title);
+                setCoverUrl(data.thumbnail ?? "");
+                setInitialContent(data.content);
+            } else {
+                toast.error("Failed to load newsletter data");
+            }
+        }
+        fetchNewsletter();
+    }, [slug]);
 
     const handleSave = async () => {
         if (!editor) return;
 
         setIsSaving(true);
         try {
-            const content = await JSON.stringify(editor.document);
+            const content = JSON.stringify(editor.document);
             const new_slug = title.toLowerCase().replace(/\s+/g, "-")
             const resp = await update_newsletter(title, content, new_slug, coverUrl, "draft", slug)
-           if (resp.ok){
-            await router.refresh()
-            toast("Newsletter saved",)
-            await router.push('/newsletter')
-        } else {  
-            toast.error(
-                `${resp.body?.detail} (Status ${resp.status})`
-            );
-            await router.refresh()
-            }
-        }finally {
-            setIsSaving(false);
-        }
-    }
-    
-    const handlePublish = async () => {
-            if (!editor) return;
-    
-            setIsPublishing(true);
-            try {
-                const content = await editor.blocksToFullHTML(editor.document);
-                const new_slug = title.toLowerCase().replace(/\s+/g, "-")
-                const resp = await update_newsletter(title, content, new_slug, coverUrl, "published", slug)
-               if (resp.ok){
+            if (resp.ok) {
                 await router.refresh()
-                toast("Newsletter saved",)
+                toast("Newsletter saved")
                 await router.push('/newsletter')
-            } else {  
+            } else {
                 toast.error(
                     `${resp.body?.detail} (Status ${resp.status})`
                 );
                 await router.refresh()
-                }
-            }finally {
-                setIsPublishing(false);
             }
+        } finally {
+            setIsSaving(false);
         }
+    }
+
+    const handlePublish = async () => {
+        if (!editor) return;
+
+        setIsPublishing(true);
+        try {
+            const content = await editor.blocksToFullHTML(editor.document);
+            const new_slug = title.toLowerCase().replace(/\s+/g, "-")
+            const resp = await update_newsletter(title, content, new_slug, coverUrl, "published", slug)
+            if (resp.ok) {
+                await router.refresh()
+                toast("Newsletter saved")
+                await router.push('/newsletter')
+            } else {
+                toast.error(
+                    `${resp.body?.detail} (Status ${resp.status})`
+                );
+                await router.refresh()
+            }
+        } finally {
+            setIsPublishing(false);
+        }
+    }
 
     const enableCover = () => {
         setCoverUrl("https://www.geoface.com/wp-content/themes/u-design/assets/images/placeholders/post-placeholder.jpg")
@@ -110,23 +111,23 @@ const NewsLetterUpdatePage = () => {
                         min-h-[70vh]
                     "
                 >
-                    <Cover url={coverUrl} setUrl={setCoverUrl}/>
+                    <Cover url={coverUrl} setUrl={setCoverUrl} />
                     <div className="px-16 py-8 flex flex-col flex-1 overflow-auto">
                         <div className='group flex flex-col gap-2'>
                             {!coverUrl && (
                                 <div className='opacity-0 group-hover:opacity-100 transition-opacity'>
-                                    <button 
+                                    <button
                                         className='hover:bg-neutral-100 text-neutral-400 rounded-md px-3 py-1 transition-colors'
                                         onClick={enableCover}
                                     > Add Cover</button>
                                 </div>
                             )}
                             <TextareaAutosize
-                            placeholder="Untitled"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="w-full resize-none bg-transparent text-5xl font-bold focus:outline-none mb-6"
-                        />
+                                placeholder="Untitled"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="w-full resize-none bg-transparent text-5xl font-bold focus:outline-none mb-6"
+                            />
                         </div>
 
                         <div className="flex-1 min-h-[40vh]">
@@ -145,7 +146,7 @@ const NewsLetterUpdatePage = () => {
                             )}
                             {isSaving ? 'Saving...' : 'Save'}
                         </Button>
-                        <Button 
+                        <Button
                             variant="secondary"
                             onClick={handlePublish}
                             disabled={isPublishing}

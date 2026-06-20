@@ -95,7 +95,7 @@ const CreateEvent = () => {
             toast.error(`${resp.body?.detail} (Status ${resp.status})`);
         }
         },
-        onError: (error: any) => {
+        onError: () => {
             toast.error("Something went wrong while creating event");
         },
     });

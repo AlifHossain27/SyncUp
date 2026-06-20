@@ -18,7 +18,7 @@ interface Newsletter {
   published_at: string;
 }
 
-const RecentContent = ({ newsletter }: { newsletter: Newsletter }) => {
+const RecentContent = () => {
     const [content, setContent] = useState<Newsletter[]>([]);
 
     

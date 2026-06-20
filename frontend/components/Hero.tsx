@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap } from 'lucide-react';
 import Image from 'next/image';
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -23,9 +24,9 @@ const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Button size="lg" asChild>
-                <a href="/newsletter" className="group">
+                <Link href="/newsletter" className="group">
                     Explore Content <ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
-                </a>
+                </Link>
               </Button>
               <Button size="lg" variant="outline">
                 Learn More
