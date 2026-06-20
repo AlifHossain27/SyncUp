@@ -5,10 +5,7 @@ export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   const publicPaths = [
-    '/',
-    '/login',
-    '/events',
-    '/newsletter',
+    '/login'
   ]
 
   const isPublicPath = publicPaths.includes(path)
