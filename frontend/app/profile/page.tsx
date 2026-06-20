@@ -26,11 +26,12 @@ const passwordFormSchema = z.object({
 });
 
 export default function ProfilePage() {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
     const router = useRouter()
     useEffect(() => {
         async function fetchProfile() {
         try {
-            const res = await fetch("http://localhost:8000/api/user/me", {
+            const res = await fetch(`${API_BASE_URL}/api/user/me`, {
             credentials: "include",
             });
             if (res.ok) {
