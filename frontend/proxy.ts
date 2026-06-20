@@ -21,10 +21,12 @@ export function proxy(request: NextRequest) {
     path = path.slice(0, -1);
   }
 
-  // Check if the page is public:
-  // "/", "/events", "/login", "/newsletter", and "/newsletter/[slug]"
+  // Retrieve the access token from cookies
+  const token = request.cookies.get("access_token")?.value;
+
+  // Define public pages: "/", "/events", "/newsletter", and "/newsletter/[slug]"
   const isPublicPage = () => {
-    if (path === "/" || path === "/events" || path === "/login" || path === "/newsletter") {
+    if (path === "/" || path === "/events" || path === "/newsletter") {
       return true;
     }
 
@@ -37,15 +39,26 @@ export function proxy(request: NextRequest) {
     return false;
   };
 
-  // If the page is not public, verify authentication
-  if (!isPublicPage()) {
-    const token = request.cookies.get("access_token")?.value;
-
-    if (!token) {
-      // Redirect unauthorized users to the login page
-      const loginUrl = new URL("/login", request.url);
-      return NextResponse.redirect(loginUrl);
+  // 1. If the user is authenticated (has token)
+  if (token) {
+    // Authenticated users should not be allowed to visit the login page
+    if (path === "/login") {
+      return NextResponse.redirect(new URL("/", request.url));
     }
+    // Allow access to all pages (both public and protected routes like /newsletter/editor)
+    return NextResponse.next();
+  }
+
+  // 2. If the user is unauthenticated (no token)
+  // Allow access to "/login" page
+  if (path === "/login") {
+    return NextResponse.next();
+  }
+
+  // If the page is not public, redirect to the login page
+  if (!isPublicPage()) {
+    const loginUrl = new URL("/login", request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
