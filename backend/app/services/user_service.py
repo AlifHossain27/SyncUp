@@ -156,5 +156,7 @@ def logout_user(response: Response):
     response.delete_cookie(
         key="access_token",
         path="/",
-        httponly=True
+        httponly=True,
+        secure=True,
+        samesite="none",
     )
