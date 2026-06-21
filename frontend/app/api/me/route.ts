@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
   }
 
-  const backendResp = await fetch(`${process.env.API_BASE_URL}/api/user/me/`, {
+  const backendResp = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/me/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

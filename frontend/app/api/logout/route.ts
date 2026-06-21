@@ -4,7 +4,7 @@ export async function POST(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
 
   if (token) {
-    await fetch(`${process.env.API_BASE_URL}/api/auth/logout/`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/logout/`, {
       method: "POST",
       headers: { Cookie: `access_token=${token}` },
     }).catch(() => null);

@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   formData.append("username", username);
   formData.append("password", password);
 
-  const backendResp = await fetch(`${process.env.API_BASE_URL}/api/auth/token/`, {
+  const backendResp = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/token/`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: formData,
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60, // match your backend's ACCESS_TOKEN_EXPIRE_MINUTES, in seconds
+    maxAge: 60 * 60,
   });
 
   return res;
