@@ -11,7 +11,6 @@ import { AppDispatch, useAppSelector } from '@/redux/store'
 import { logIn, logOut } from '@/redux/features/auth-slice'
 
 const Header = () => {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const isAuth = useAppSelector((state) => state.auth.isAuthenticated)
@@ -20,10 +19,9 @@ const Header = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const logout = async () => {
-    await fetch(`${API_BASE_URL}/api/auth/logout/`, {
+    await fetch(`/api/logout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
     })
     toast("Logged out")
     dispatch(logOut())
@@ -41,10 +39,9 @@ const Header = () => {
   useEffect(() => {
     (async () => {
       try {
-        const resp = await fetch(`${API_BASE_URL}/api/user/me/`, {
+        const resp = await fetch(`/api/me`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
         })
         if (resp.ok) {
           dispatch(logIn())
@@ -55,7 +52,7 @@ const Header = () => {
         console.log('connection failed')
       }
     })()
-  }, [dispatch, API_BASE_URL])
+  }, [dispatch])
 
   const navLinks = [
     { href: '/newsletter/', label: 'Newsletters' },

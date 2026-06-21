@@ -40,11 +40,10 @@ export default function LoginPage() {
     formData.append('password', values.password)
 
     try {
-      const resp = await fetch(`${API_BASE_URL}/api/auth/token/`, {
+      const resp = await fetch(`/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData,
-        credentials: 'include',
       })
 
       if (resp.ok) {
