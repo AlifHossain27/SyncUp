@@ -20,6 +20,7 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/login',
     '/subscribers',
     '/newsletter/editor',
     '/profile'
