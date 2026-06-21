@@ -1,63 +1,61 @@
+"use server";
+
+import { cookies } from "next/headers";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-export async function get_subscriber(){
-    const resp = await fetch(`${API_BASE_URL}/api/subscribers/`,{
+
+async function authHeaders() {
+    const cookieStore = await cookies();
+    return {
+        'Content-Type': 'application/json',
+        Cookie: cookieStore.toString(),
+    };
+}
+
+export async function get_subscriber() {
+    const resp = await fetch(`${API_BASE_URL}/api/subscribers/`, {
         method: 'GET',
-        headers: {'Content-Type':'application/json'},
-        credentials: 'include',
+        headers: await authHeaders(),
+        cache: "no-store",
     })
     const data = await resp.json();
-    return {
-        ok: resp.ok,
-        status: resp.status,
-        body: data,
-    };
+    return { ok: resp.ok, status: resp.status, body: data };
 }
 
-export async function add_subscriber(first_name: string, last_name: string, email: string, department: string){
-    const resp = await fetch(`${API_BASE_URL}/api/subscriber/create/`,{
+export async function add_subscriber(first_name: string, last_name: string, email: string, department: string) {
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/create/`, {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        credentials: 'include',
+        headers: await authHeaders(),
         body: JSON.stringify({
-        'first_name': first_name,
-        'last_name': last_name,
-        'email': email,
-        'department': department
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'department': department
         })
     })
     const data = await resp.json();
-    return {
-        ok: resp.ok,
-        status: resp.status,
-        body: data,
-    };
+    return { ok: resp.ok, status: resp.status, body: data };
 }
 
-export async function update_subscriber(uuid: string, first_name: string, last_name: string, email: string, department: string){
-    const resp = await fetch(`${API_BASE_URL}/api/subscriber/${uuid}/`,{
+export async function update_subscriber(uuid: string, first_name: string, last_name: string, email: string, department: string) {
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/${uuid}/`, {
         method: 'PATCH',
-        headers: {'Content-Type':'application/json'},
-        credentials: 'include',
+        headers: await authHeaders(),
         body: JSON.stringify({
-        'first_name': first_name,
-        'last_name': last_name,
-        'email': email,
-        'department': department
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'department': department
         })
     })
     const data = await resp.json();
-    return {
-        ok: resp.ok,
-        status: resp.status,
-        body: data,
-    };
+    return { ok: resp.ok, status: resp.status, body: data };
 }
 
-export async function delete_subscriber(uuid: string){
-    const resp = await fetch(`${API_BASE_URL}/api/subscriber/${uuid}/`,{
+export async function delete_subscriber(uuid: string) {
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/${uuid}/`, {
         method: 'DELETE',
-        headers: {'Content-Type':'application/json'},
-        credentials: 'include'
+        headers: await authHeaders(),
     })
     let data = null;
     if (resp.status !== 204) {
@@ -67,20 +65,18 @@ export async function delete_subscriber(uuid: string){
             console.warn("No JSON to parse:", e);
         }
     }
-    return {
-        ok: resp.ok,
-        status: resp.status,
-        body: data,
-    };
+    return { ok: resp.ok, status: resp.status, body: data };
 }
 
 export async function uploadSubscribersFile(file: File) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/subscriber/upload/`, {
+    const cookieStore = await cookies();
+
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/upload/`, {
         method: "POST",
-        credentials: "include",
+        headers: { Cookie: cookieStore.toString() }, // no Content-Type — let fetch set multipart boundary
         body: formData,
     });
 
@@ -91,9 +87,5 @@ export async function uploadSubscribersFile(file: File) {
         console.warn("No JSON returned from upload:", e);
     }
 
-    return {
-        ok: resp.ok,
-        status: resp.status,
-        body: data,
-    };
+    return { ok: resp.ok, status: resp.status, body: data };
 }
