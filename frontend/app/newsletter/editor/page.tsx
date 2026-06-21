@@ -36,7 +36,6 @@ const NewsLetterEditorPage = () => {
 
             const resp = await create_newsletter(title, content, title.toLowerCase().replace(/\s+/g, "-"), coverUrl, "draft")
            if (resp.ok){
-            await router.refresh()
             toast("Newsletter saved",)
             await router.push('/newsletter')
         } else {  
@@ -59,7 +58,6 @@ const NewsLetterEditorPage = () => {
 
             const resp = await create_newsletter(title, content, title.toLowerCase().replace(/\s+/g, "-"), coverUrl, "published")
            if (resp.ok){
-            await router.refresh()
             toast("Newsletter published",)
             await router.push('/newsletter')
         } else {  

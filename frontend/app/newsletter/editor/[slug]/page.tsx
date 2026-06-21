@@ -54,7 +54,6 @@ const NewsLetterUpdatePage = () => {
             const new_slug = title.toLowerCase().replace(/\s+/g, "-")
             const resp = await update_newsletter(title, content, new_slug, coverUrl, "draft", slug)
             if (resp.ok) {
-                await router.refresh()
                 toast("Newsletter saved")
                 await router.push('/newsletter')
             } else {
@@ -77,8 +76,7 @@ const NewsLetterUpdatePage = () => {
             const new_slug = title.toLowerCase().replace(/\s+/g, "-")
             const resp = await update_newsletter(title, content, new_slug, coverUrl, "published", slug)
             if (resp.ok) {
-                await router.refresh()
-                toast("Newsletter saved")
+                toast("Newsletter published")
                 await router.push('/newsletter')
             } else {
                 toast.error(

@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from 'next/navigation'
+import { get_profile, update_profile, change_password } from "@/actions/profile";
 
 const profileFormSchema = z.object({
     username: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -26,31 +27,7 @@ const passwordFormSchema = z.object({
 });
 
 export default function ProfilePage() {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
     const router = useRouter()
-    useEffect(() => {
-        async function fetchProfile() {
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/user/me`, {
-            credentials: "include",
-            });
-            if (res.ok) {
-            const user = await res.json();
-            profileForm.reset({
-                username: user.username,
-                email: user.email,
-            });
-            } else {
-            throw new Error("Failed to fetch user data");
-            }
-        } catch (err) {
-            console.error(err);
-            toast.error("Failed to load profile data");
-        }
-        }
-
-        fetchProfile();
-    }, []);
 
     const profileForm = useForm<z.infer<typeof profileFormSchema>>({
         resolver: zodResolver(profileFormSchema),
@@ -69,66 +46,45 @@ export default function ProfilePage() {
         },
     });
 
-    async function onProfileSubmit(values: z.infer<typeof profileFormSchema>) {
-        try {
-            const res = await fetch("http://localhost:8000/api/user/me/", {
-            method: "PATCH",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: values.username,
-                email: values.email,
-            }),
-            });
-
-            if (res.ok) {
-                const updatedUser = await res.json();
-                toast.success("Profile updated successfully");
-                await router.refresh()
+    useEffect(() => {
+        async function fetchProfile() {
+            const resp = await get_profile();
+            if (resp.ok) {
                 profileForm.reset({
-                    username: updatedUser.username,
-                    email: updatedUser.email,
+                    username: resp.body.username,
+                    email: resp.body.email,
                 });
             } else {
-                const errorData = await res.json();
-                toast.error(errorData.detail || "Failed to update profile");
+                toast.error("Failed to load profile data");
             }
-        } catch (err) {
-            toast.error("Network error updating profile");
-            console.error(err);
+        }
+        fetchProfile();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    async function onProfileSubmit(values: z.infer<typeof profileFormSchema>) {
+        const resp = await update_profile(values.username, values.email);
+        if (resp.ok) {
+            toast.success("Profile updated successfully");
+            router.refresh();
+            profileForm.reset({
+                username: resp.body.username,
+                email: resp.body.email,
+            });
+        } else {
+            toast.error(resp.body?.detail || "Failed to update profile");
         }
     }
 
     async function onPasswordSubmit(values: z.infer<typeof passwordFormSchema>) {
-        try {
-            const res = await fetch("http://localhost:8000/api/user/change-password", {
-            method: "PATCH",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                current_password: values.currentPassword,
-                new_password: values.newPassword,
-                new_password_confirm: values.confirmPassword,
-            }),
-            });
-
-            if (res.ok) {
+        const resp = await change_password(values.currentPassword, values.newPassword, values.confirmPassword);
+        if (resp.ok) {
             toast.success("Password changed successfully");
-            await router.refresh()
-            passwordForm.reset()
-            } else {
-            const errorData = await res.json();
-            toast.error(errorData.detail || "Failed to change password");
-            }
-        } catch (err) {
-            toast.error("Network error changing password");
-            console.error(err);
+            router.refresh();
+            passwordForm.reset();
+        } else {
+            toast.error(resp.body?.detail || "Failed to change password");
         }
-        passwordForm.resetField
     }
 
     return (
