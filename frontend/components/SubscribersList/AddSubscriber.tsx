@@ -1,7 +1,9 @@
-import React from 'react'
+"use client";
+
+import React, { useState } from 'react'
 import { Button } from '../ui/button'
 import { Input } from "@/components/ui/input"
-import {  UserPlus } from "lucide-react"
+import { UserPlus, Loader2 } from "lucide-react"
 import { useRouter } from 'next/navigation'
 import {
     Dialog,
@@ -10,6 +12,7 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogClose,
+    DialogFooter,
   } from "@/components/ui/dialog"
 import {
     Form,
@@ -42,7 +45,8 @@ const formSchema = z.object({
 
 const AddSubscriber = () => {
     const router = useRouter()
-    
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -50,105 +54,126 @@ const AddSubscriber = () => {
           last_name: "",
           email: "",
           department: ""
-
         },
     })
 
-    async function onSubmit(values: z.infer<typeof formSchema>){
-        const resp = await add_subscriber(values.first_name, values.last_name, values.email, values.department)
-        if (resp.ok){
-            await router.refresh()
-            await form.reset();
-            toast("Successfully Added New Subscriber",)
-            setTimeout(() => {
-                document.getElementById("dialog-close-button")?.click();
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsSubmitting(true)
+        try {
+            const resp = await add_subscriber(values.first_name, values.last_name, values.email, values.department)
+            if (resp.ok) {
+                await router.refresh()
+                form.reset();
+                toast.success("Successfully added new subscriber")
+                setTimeout(() => {
+                    document.getElementById("dialog-close-button")?.click();
                 }, 50);
-        } else {  
-            toast.error(
-                `${resp.body?.detail} (Status ${resp.status})`
-            );
-            await router.refresh()
+            } else {
+                toast.error(
+                    `${resp.body?.detail} (Status ${resp.status})`
+                );
+                await router.refresh()
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
   return (
-    <div>
     <Dialog>
         <DialogTrigger asChild>
-            <Button variant='default' size='lg'><UserPlus size={40}/>Add Subscriber</Button>
+            <Button variant='default' size='lg' className="gap-2">
+                <UserPlus className="h-5 w-5" />
+                Add Subscriber
+            </Button>
         </DialogTrigger>
-        <DialogContent className='py-15 px-10'>
-            <DialogHeader>
-            <DialogTitle className="text-2xl">Add New Subscriber:</DialogTitle>
-                <DialogDescription className='text-sm text-gray-500'>Enter the details of the new subscriber</DialogDescription>
+        <DialogContent className="sm:max-w-md">
+            <DialogHeader className="space-y-1">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                        <UserPlus className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                        <DialogTitle className="text-xl">Add New Subscriber</DialogTitle>
+                        <DialogDescription className="text-sm text-muted-foreground">
+                            Enter the details of the new subscriber
+                        </DialogDescription>
+                    </div>
+                </div>
             </DialogHeader>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                    control={form.control}
-                    name="first_name"
-                    render={({ field }) => (
-                        <FormItem className='flex'>
-                            <FormLabel className='w-40 text-md'>First Name:</FormLabel>
-                        <FormControl>
-                            <Input autoComplete='off' placeholder="First Name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="last_name"
-                    render={({ field }) => (
-                        <FormItem className='flex'>
-                            <FormLabel className='w-40 text-md'>Last Name:</FormLabel>
-                        <FormControl>
-                            <Input autoComplete='off' placeholder="Last Name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem className='flex'>
-                            <FormLabel className='w-40 text-md'>Email:</FormLabel>
-                        <FormControl>
-                            <Input autoComplete='off' placeholder="Email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="department"
-                    render={({ field }) => (
-                        <FormItem className='flex'>
-                            <FormLabel className='w-40 text-md'>Department:</FormLabel>
-                        <FormControl>
-                            <Input autoComplete='off' placeholder="Department" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <div className='pt-5'>
-                        <Button className='text-center w-full h-10 text-lg' type="submit" >Add Subscriber</Button>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-2">
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="first_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>First Name</FormLabel>
+                                    <FormControl>
+                                        <Input autoComplete='off' placeholder="John" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="last_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Last Name</FormLabel>
+                                    <FormControl>
+                                        <Input autoComplete='off' placeholder="Doe" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                     </div>
-                        
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input type="email" autoComplete='off' placeholder="john.doe@example.com" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="department"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Department</FormLabel>
+                                <FormControl>
+                                    <Input autoComplete='off' placeholder="e.g., Computer Science" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <DialogFooter className="pt-4 gap-2 sm:gap-2">
+                        <DialogClose asChild>
+                            <Button type="button" variant="outline" id="dialog-close-button">
+                                Cancel
+                            </Button>
+                        </DialogClose>
+                        <Button type="submit" disabled={isSubmitting} className="gap-2">
+                            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                            {isSubmitting ? "Adding..." : "Add Subscriber"}
+                        </Button>
+                    </DialogFooter>
                 </form>
             </Form>
-            <DialogClose asChild>
-                    <Button id="dialog-close-button" className="hidden" />
-            </DialogClose>
         </DialogContent>
-        </Dialog>
-    </div>
+    </Dialog>
   )
 }
+
 
 export default AddSubscriber

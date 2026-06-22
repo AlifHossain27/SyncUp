@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import Image from 'next/image';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from "sonner";
 import { get_archive_newsletters } from "@/actions/newsletters";
 import Link from "next/link";
-import { ArrowRight, Inbox, Newspaper } from 'lucide-react';
+import { ArrowRight, Newspaper } from 'lucide-react';
 
 interface Newsletter {
   uuid: string;
@@ -18,10 +18,26 @@ interface Newsletter {
   published_at: string;
 }
 
+function CardSkeleton() {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card animate-pulse">
+      <div className="h-48 bg-muted" />
+      <div className="p-6 space-y-4">
+        <div className="h-5 w-3/4 bg-muted rounded" />
+        <div className="h-5 w-1/2 bg-muted rounded" />
+      </div>
+      <div className="p-6 pt-0 flex justify-between items-center">
+        <div className="h-4 w-20 bg-muted rounded" />
+        <div className="h-4 w-16 bg-muted rounded" />
+      </div>
+    </div>
+  );
+}
+
 const RecentContent = () => {
     const [content, setContent] = useState<Newsletter[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    
     useEffect(() => {
     async function fetchContent() {
         const resp = await get_archive_newsletters(0,3)
@@ -30,6 +46,7 @@ const RecentContent = () => {
         } else {
         toast.error("Failed to load drafts");
         }
+        setLoading(false);
     }
     fetchContent();
     }, []);
@@ -44,7 +61,12 @@ const RecentContent = () => {
             </div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {content.map(newsletter => (
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <CardSkeleton key={i} />
+                  ))
+                ) : (
+                  content.map(newsletter => (
                     <Card
                         key={newsletter.uuid}
                         className="bg-card border-border overflow-hidden group flex flex-col transform transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 p-0 m-0"
@@ -90,7 +112,8 @@ const RecentContent = () => {
                             </Link>
                         </CardFooter>
                     </Card>
-                ))}
+                  ))
+                )}
             </div>
 
             <div className="text-center mt-16">

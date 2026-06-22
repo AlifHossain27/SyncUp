@@ -4,13 +4,12 @@ import React, { useEffect, useState } from "react";
 import { delete_newsletter, get_draft_newsletters } from "@/actions/newsletters";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Edit, Send, Trash2, Newspaper } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Newspaper } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { ImSpinner2 } from "react-icons/im";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +17,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 
@@ -29,6 +27,22 @@ interface Newsletter {
   summary?: string;
   thumbnail?: string;
   status: string;
+}
+
+function DraftCardSkeleton() {
+  return (
+    <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col animate-pulse">
+      <div className="w-full h-48 bg-muted" />
+      <div className="p-6 space-y-3 flex-grow">
+        <div className="h-5 w-3/4 bg-muted rounded" />
+        <div className="h-5 w-1/2 bg-muted rounded" />
+      </div>
+      <div className="p-6 pt-0 flex justify-end gap-2">
+        <div className="h-9 w-20 bg-muted rounded-md" />
+        <div className="h-9 w-9 bg-muted rounded-md" />
+      </div>
+    </div>
+  );
 }
 
 const DraftList = () => {
@@ -49,10 +63,6 @@ const DraftList = () => {
     }
     fetchDrafts();
   }, []);
-
-  if (loading) return (<div className='pt-20 flex justify-center'>
-          <ImSpinner2 className="animate-spin" size="50" />
-        </div>);
 
   const openDeleteDialog = (uuid: string) => {
     setDeleteTarget(uuid);
@@ -90,11 +100,13 @@ const DraftList = () => {
         </Button>
       </div>
       {loading ? (
-        <div className='flex justify-center'>
-          <ImSpinner2 className="animate-spin" size="50" />
+        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <DraftCardSkeleton key={i} />
+          ))}
         </div>
-      ) : 
-      (<div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
+      ) : (
+      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
         {drafts.length === 0 && <p>No drafts found.</p>}
         {drafts.map((newsletter) => (
           <Card
@@ -137,7 +149,8 @@ const DraftList = () => {
             </CardFooter>
           </Card>
         ))}
-      </div>)}
+      </div>
+      )}
       <Separator className="my-16" />
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

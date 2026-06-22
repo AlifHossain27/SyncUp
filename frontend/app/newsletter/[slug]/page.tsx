@@ -9,12 +9,38 @@ import OnScrollProgress from "@/components/OnScrollProgress/OnScrollProgress";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
 
+function NewsletterSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 animate-pulse">
+      <div className="h-9 sm:h-10 w-3/4 bg-muted rounded mb-4" />
+      <div className="flex mb-6 items-center gap-3">
+        <div className="h-12 w-12 rounded-full bg-muted" />
+        <div className="flex flex-col gap-2">
+          <div className="h-4 w-32 bg-muted rounded" />
+          <div className="h-3 w-20 bg-muted rounded" />
+        </div>
+      </div>
+      <div className="mb-6 w-full h-64 bg-muted rounded-lg" />
+      <div className="space-y-3">
+        <div className="h-4 w-full bg-muted rounded" />
+        <div className="h-4 w-full bg-muted rounded" />
+        <div className="h-4 w-5/6 bg-muted rounded" />
+        <div className="h-4 w-full bg-muted rounded" />
+        <div className="h-4 w-2/3 bg-muted rounded" />
+        <div className="h-4 w-full bg-muted rounded" />
+        <div className="h-4 w-3/4 bg-muted rounded" />
+      </div>
+    </div>
+  );
+}
+
 const NewsletterViewPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [title, setTitle] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [date, setDate] = useState("")
   const [initialContent, setInitialContent] = useState<string | undefined>();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchNewsletter() {
@@ -29,11 +55,19 @@ const NewsletterViewPage: React.FC = () => {
       } else {
         toast.error("Failed to load newsletter data");
       }
+      setLoading(false);
     }
     fetchNewsletter();
   }, [slug]);
 
-  console.log(initialContent);
+  if (loading) {
+    return (
+      <>
+        <OnScrollProgress/>
+        <NewsletterSkeleton />
+      </>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6">
@@ -72,7 +106,7 @@ const NewsletterViewPage: React.FC = () => {
       )}
 
 
-      {initialContent ? (
+      {initialContent && (
         <article className="bg-white dark:bg-[#0b0b0b] ">
           <div
             className="
@@ -89,8 +123,6 @@ const NewsletterViewPage: React.FC = () => {
             dangerouslySetInnerHTML={{ __html: initialContent }}
           />
         </article>
-      ) : (
-        <p className="text-muted-foreground">Loading content…</p>
       )}
     </div>
   );

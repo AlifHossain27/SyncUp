@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +10,7 @@ import { useRouter } from 'next/navigation'
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner"
 import { CheckCircle } from 'lucide-react';
-import { add_subscriber } from "@/actions/subscribers";
+import { new_subscriber } from "@/actions/subscribers";
 
 const formSchema = z.object({
     firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
@@ -23,8 +24,15 @@ const formSchema = z.object({
         }),
 });
 
+const MAX_ATTEMPTS = 3;
+const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+const COOLDOWN_MS = 10 * 1000; 
+
 const SubscriptionAim = () => {
     const router = useRouter()
+    const [cooldown, setCooldown] = useState(0);
+    const attemptsRef = useRef<number[]>([]); 
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -35,20 +43,47 @@ const SubscriptionAim = () => {
         },
     });
 
-    async function onSubmit(values: z.infer<typeof formSchema>){
-            const resp = await add_subscriber(values.firstName, values.lastName, values.email, values.department)
-            if (resp.ok){
-                await router.refresh()
-                await form.reset();
-                toast("Successfully Subscribered",)
-            } else {  
-                toast.error(
-                    `${resp.body?.detail} (Status ${resp.status})`
-                );
-                await router.refresh()
-            }
+    useEffect(() => {
+        if (cooldown <= 0) return;
+        const interval = setInterval(() => {
+            setCooldown((prev) => Math.max(prev - 1, 0));
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [cooldown]);
+
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        const now = Date.now();
+
+        attemptsRef.current = attemptsRef.current.filter((t) => now - t < WINDOW_MS);
+
+        if (attemptsRef.current.length >= MAX_ATTEMPTS) {
+            toast.error("Too many attempts. Please try again later.");
+            return;
         }
-    
+
+        if (cooldown > 0) {
+            toast.error(`Please wait ${cooldown}s before trying again.`);
+            return;
+        }
+
+        attemptsRef.current.push(now);
+        setCooldown(COOLDOWN_MS / 1000);
+
+        const resp = await new_subscriber(values.firstName, values.lastName, values.email, values.department)
+        if (resp.ok) {
+            await router.refresh()
+            await form.reset();
+            toast("Successfully Subscribered",)
+        } else {
+            toast.error(
+                `${resp.body?.detail} (Status ${resp.status})`
+            );
+            await router.refresh()
+        }
+    }
+
+    const isLocked = cooldown > 0;
+
     return (
         <section id="subscribe" className="py-20 md:py-28 bg-[#f8f8f8]">
             <div className="container mx-auto px-4 md:px-6">
@@ -134,7 +169,9 @@ const SubscriptionAim = () => {
                                         </FormItem>
                                     )}
                                 />
-                                <Button type="submit" size="lg" className="w-full">Subscribe</Button>
+                                <Button type="submit" size="lg" className="w-full" disabled={isLocked}>
+                                    {isLocked ? `Please wait ${cooldown}s...` : "Subscribe"}
+                                </Button>
                             </form>
                         </Form>
                          <p className="text-xs text-muted-foreground mt-4">We respect your privacy. No spam.</p>

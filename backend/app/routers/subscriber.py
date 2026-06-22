@@ -1,7 +1,8 @@
 import traceback
 from uuid import UUID
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, Request
 from sqlalchemy.orm import Session
+from app.core.rate_limiting import limiter
 from app.db.deps import get_db
 from app.schemas.subscriber_schemas import SubscriberCreate, SubscriberSchema
 from app.services.subscriber_service import (
@@ -25,8 +26,20 @@ from app.exceptions.handler import (
 
 subscriber_router = APIRouter()
 
+@subscriber_router.post("/subscriber/new/", response_model=SubscriberSchema, status_code=201)
+@limiter.limit("5/hour")
+async def new_subscriber_route(request: Request, subscriber: SubscriberCreate, db: Session = Depends(get_db)):
+    try:
+        return create_subscriber(subscriber=subscriber, db=db)
+    except (NotFoundException, ConflictException, BadRequestException) as error:
+        raise error
+    except Exception as e:
+        print(traceback.format_exc())
+        raise BadRequestException()
+    
+
 @subscriber_router.post("/subscriber/create/", response_model=SubscriberSchema, status_code=201)
-async def create_subscriber_route(subscriber: SubscriberCreate, db: Session = Depends(get_db)):
+async def create_subscriber_route(subscriber: SubscriberCreate, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
         return create_subscriber(subscriber=subscriber, db=db)
     except (NotFoundException, ConflictException, BadRequestException) as error:

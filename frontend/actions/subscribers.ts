@@ -37,6 +37,21 @@ export async function add_subscriber(first_name: string, last_name: string, emai
     return { ok: resp.ok, status: resp.status, body: data };
 }
 
+export async function new_subscriber(first_name: string, last_name: string, email: string, department: string) {
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/new/`, {
+        method: 'POST',
+        headers: await authHeaders(),
+        body: JSON.stringify({
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'department': department
+        })
+    })
+    const data = await resp.json();
+    return { ok: resp.ok, status: resp.status, body: data };
+}
+
 export async function update_subscriber(uuid: string, first_name: string, last_name: string, email: string, department: string) {
     const resp = await fetch(`${API_BASE_URL}/api/subscriber/${uuid}/`, {
         method: 'PATCH',

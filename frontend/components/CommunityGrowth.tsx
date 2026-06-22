@@ -36,8 +36,23 @@ const monthNames = [
   "July", "August", "September", "October", "November", "December"
 ]
 
+function ChartSkeleton() {
+  return (
+    <div className="w-full h-[400px] flex items-end gap-4 px-4 pb-6 animate-pulse">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div
+          key={i}
+          className="flex-1 bg-muted rounded-t-md"
+          style={{ height: `${30 + ((i * 37) % 60)}%` }}
+        />
+      ))}
+    </div>
+  )
+}
+
 const DataChart = () => {
   const [chartData, setChartData] = useState<SubscriberGrowth[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const now = new Date()
@@ -57,6 +72,7 @@ const DataChart = () => {
       } else {
         console.error("Failed to load growth data", res.status)
       }
+      setLoading(false)
     }
 
     fetchData()
@@ -81,24 +97,28 @@ const DataChart = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="w-full h-[400px]">
-              <BarChart accessibilityLayer data={chartData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickFormatter={(value) => value.slice(0, 3)}
-                />
-                <YAxis />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dashed" />}
-                />
-                <Bar dataKey="subscribers" fill="#ff6900" radius={4} />
-              </BarChart>
-            </ChartContainer>
+            {loading ? (
+              <ChartSkeleton />
+            ) : (
+              <ChartContainer config={chartConfig} className="w-full h-[400px]">
+                <BarChart accessibilityLayer data={chartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    tickFormatter={(value) => value.slice(0, 3)}
+                  />
+                  <YAxis />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dashed" />}
+                  />
+                  <Bar dataKey="subscribers" fill="#ff6900" radius={4} />
+                </BarChart>
+              </ChartContainer>
+            )}
           </CardContent>
         </Card>
       </div>
