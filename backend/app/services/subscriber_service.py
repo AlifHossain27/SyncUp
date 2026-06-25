@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from app.core.config import settings
 from fastapi import UploadFile, File
 from app.schemas.subscriber_schemas import SubscriberCreate, SubscriberSchema
-from app.models.subscriber_model import Subscriber
+from app.models.subscriber_model import Subscriber, SubscriberTypeEnum
 from app.exceptions.handler import (
     ConflictException,
     NotFoundException,
@@ -50,6 +50,7 @@ def update_subscriber(uuid: UUID, updated_attributes: SubscriberCreate, db: Sess
     db_subscriber.last_name = updated_attributes.last_name
     db_subscriber.email = updated_attributes.email
     db_subscriber.department = updated_attributes.department
+    db_subscriber.subscriber_type = updated_attributes.subscriber_type
     db_subscriber.updated_at = datetime.now(tz = timezone.utc)
 
     db.commit()
@@ -94,13 +95,24 @@ async def process_subscribers_upload(file: UploadFile, db: Session):
 
         df.drop_duplicates(subset=["email"], inplace=True)
 
+        has_type_col = "subscriber_type" in df.columns
+
         subscribers = []
         for _, row in df.iterrows():
+            subscriber_type = SubscriberTypeEnum.general
+            if has_type_col:
+                raw_type = str(row["subscriber_type"]).strip()
+                try:
+                    subscriber_type = SubscriberTypeEnum(raw_type) if raw_type in SubscriberTypeEnum._value2member_map_ else SubscriberTypeEnum[raw_type.lower()]
+                except (KeyError, ValueError):
+                    subscriber_type = SubscriberTypeEnum.general
+
             subscriber_data = SubscriberCreate(
                 first_name=str(row["first_name"]).strip(),
                 last_name=str(row["last_name"]).strip(),
                 email=str(row["email"]).strip(),
-                department=str(row["department"]).strip()
+                department=str(row["department"]).strip(),
+                subscriber_type=subscriber_type
             )
             try:
                 from app.services.subscriber_service import create_subscriber
@@ -135,7 +147,6 @@ def get_subscriber_growth(db: Session, year: int):
         .all()
     )
 
-    # Convert month number → readable name
     month_names = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"

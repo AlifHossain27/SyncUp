@@ -1,7 +1,14 @@
-from sqlalchemy import Column, String, DateTime, func
+from sqlalchemy import Column, String, DateTime, Enum, func
 from sqlalchemy.dialects.postgresql import UUID
 from app.db.database import Base
 import uuid
+import enum
+
+class SubscriberTypeEnum(str, enum.Enum):
+    general = "General"
+    alumni = "Alumni"
+    faculty = "Faculty"
+    oca = "OCA"
 
 class Subscriber(Base):
     __tablename__ = "subscribers"
@@ -11,5 +18,6 @@ class Subscriber(Base):
     last_name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     department = Column(String, nullable=False)
+    subscriber_type = Column(Enum(SubscriberTypeEnum), default=SubscriberTypeEnum.general, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

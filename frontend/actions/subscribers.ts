@@ -22,7 +22,7 @@ export async function get_subscriber() {
     return { ok: resp.ok, status: resp.status, body: data };
 }
 
-export async function add_subscriber(first_name: string, last_name: string, email: string, department: string) {
+export async function add_subscriber(first_name: string, last_name: string, email: string, department: string, subscriber_type: string) {
     const resp = await fetch(`${API_BASE_URL}/api/subscriber/create/`, {
         method: 'POST',
         headers: await authHeaders(),
@@ -30,12 +30,14 @@ export async function add_subscriber(first_name: string, last_name: string, emai
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
-            'department': department
+            'department': department,
+            'subscriber_type': subscriber_type
         })
     })
     const data = await resp.json();
     return { ok: resp.ok, status: resp.status, body: data };
 }
+
 
 export async function new_subscriber(first_name: string, last_name: string, email: string, department: string) {
     const resp = await fetch(`${API_BASE_URL}/api/subscriber/new/`, {
@@ -45,14 +47,15 @@ export async function new_subscriber(first_name: string, last_name: string, emai
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
-            'department': department
+            'department': department,
+            'subscriber_type': "General"
         })
     })
     const data = await resp.json();
     return { ok: resp.ok, status: resp.status, body: data };
 }
 
-export async function update_subscriber(uuid: string, first_name: string, last_name: string, email: string, department: string) {
+export async function update_subscriber(uuid: string, first_name: string, last_name: string, email: string, department: string, subscriber_type: string) {
     const resp = await fetch(`${API_BASE_URL}/api/subscriber/${uuid}/`, {
         method: 'PATCH',
         headers: await authHeaders(),
@@ -60,7 +63,8 @@ export async function update_subscriber(uuid: string, first_name: string, last_n
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
-            'department': department
+            'department': department,
+            'subscriber_type': subscriber_type
         })
     })
     const data = await resp.json();

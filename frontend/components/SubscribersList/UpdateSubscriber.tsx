@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react'
 import { Button } from '../ui/button'
 import { Input } from "@/components/ui/input"
@@ -20,11 +22,20 @@ import {
     FormLabel,
     FormMessage,
   } from "@/components/ui/form"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { update_subscriber } from '@/actions/subscribers'
+
+const SUBSCRIBER_TYPES = ["General", "Alumni", "Faculty", "OCA"] as const
 
 const formSchema = z.object({
     first_name: z.string().min(4, {
@@ -37,6 +48,7 @@ const formSchema = z.object({
     department: z.string().min(2, {
       message: "Department must be at least 2 characters.",
     }),
+    subscriber_type: z.enum(SUBSCRIBER_TYPES),
 })
 
 type SubscriberDataProps = {
@@ -44,10 +56,11 @@ type SubscriberDataProps = {
     first_name: string,
     last_name: string,
     email: string,
-    department: string
+    department: string,
+    subscriber_type: typeof SUBSCRIBER_TYPES[number],
 }
 
-const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: SubscriberDataProps) => {
+const UpdateSubscriber = ({uuid, first_name, last_name, email, department, subscriber_type}: SubscriberDataProps) => {
     const router = useRouter()
     
     const form = useForm<z.infer<typeof formSchema>>({
@@ -56,23 +69,21 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
           first_name: first_name,
           last_name: last_name,
           email: email,
-          department: department
-
+          department: department,
+          subscriber_type: subscriber_type,
         },
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>){
-        const resp = await update_subscriber(uuid, values.first_name, values.last_name, values.email, values.department)
+        const resp = await update_subscriber(uuid, values.first_name, values.last_name, values.email, values.department, values.subscriber_type)
         if (resp.ok){
             await router.refresh()
-            await form.resetField
             toast("Successfully Updated Subscriber",)
             setTimeout(() => {
                 document.getElementById("dialog-close-button")?.click();
                 }, 50);
         } else {  
             await router.refresh()
-            await form.resetField
             toast.error(
                 `${resp.body?.detail} (Status ${resp.status})`
             );
@@ -140,6 +151,28 @@ const UpdateSubscriber = ({uuid, first_name, last_name, email, department}: Subs
                         <FormControl>
                             <Input autoComplete='off' placeholder="Department" {...field} />
                         </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="subscriber_type"
+                    render={({ field }) => (
+                        <FormItem className='flex'>
+                            <FormLabel className='w-40 text-md'>Type:</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {SUBSCRIBER_TYPES.map((type) => (
+                                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         <FormMessage />
                         </FormItem>
                     )}

@@ -22,12 +22,21 @@ import {
     FormLabel,
     FormMessage,
   } from "@/components/ui/form"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { add_subscriber } from '@/actions/subscribers'
 import { DialogDescription } from '@radix-ui/react-dialog'
+
+const SUBSCRIBER_TYPES = ["General", "Alumni", "Faculty", "OCA"] as const
 
 const formSchema = z.object({
     first_name: z.string().min(4, {
@@ -40,6 +49,7 @@ const formSchema = z.object({
     department: z.string().min(2, {
       message: "Department must be at least 2 characters.",
     }),
+    subscriber_type: z.enum(SUBSCRIBER_TYPES),
   })
 
 
@@ -53,14 +63,15 @@ const AddSubscriber = () => {
           first_name: "",
           last_name: "",
           email: "",
-          department: ""
+          department: "",
+          subscriber_type: "General",
         },
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true)
         try {
-            const resp = await add_subscriber(values.first_name, values.last_name, values.email, values.department)
+            const resp = await add_subscriber(values.first_name, values.last_name, values.email, values.department, values.subscriber_type)
             if (resp.ok) {
                 await router.refresh()
                 form.reset();
@@ -144,19 +155,43 @@ const AddSubscriber = () => {
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name="department"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Department</FormLabel>
-                                <FormControl>
-                                    <Input autoComplete='off' placeholder="e.g., Computer Science" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="department"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Department</FormLabel>
+                                    <FormControl>
+                                        <Input autoComplete='off' placeholder="e.g., Computer Science" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="subscriber_type"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Type</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select type" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {SUBSCRIBER_TYPES.map((type) => (
+                                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
                     <DialogFooter className="pt-4 gap-2 sm:gap-2">
                         <DialogClose asChild>
                             <Button type="button" variant="outline" id="dialog-close-button">
