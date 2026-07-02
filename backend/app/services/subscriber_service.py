@@ -72,6 +72,18 @@ def retrieve_all_emails(db: Session) -> list[str]:
     emails = db.query(Subscriber.email).all()
     return [email[0] for email in emails]
 
+def retrieve_subscribers_for_email(db: Session) -> list[tuple[str, str]]:
+    results = db.query(Subscriber.uuid, Subscriber.email).all()
+    return [(str(uuid), email) for uuid, email in results]
+
+def unsubscribe_subscriber(uuid: UUID, db: Session):
+    subscriber = db.query(Subscriber).filter(Subscriber.uuid == uuid).first()
+    if subscriber is None:
+        raise NotFoundException(f"Subscriber not found")
+    db.delete(subscriber)
+    db.commit()
+    return {"success": True}
+
 async def process_subscribers_upload(file: UploadFile, db: Session):
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     file_path = os.path.join(settings.UPLOAD_DIR, file.filename)
@@ -80,13 +92,14 @@ async def process_subscribers_upload(file: UploadFile, db: Session):
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
-        if file.filename.endswith(".csv"):
+        filename = file.filename.lower()
+
+        if filename.endswith(".csv"):
             df = pd.read_csv(file_path)
-        elif file.filename.endswith((".xls", ".xlsx")):
+        elif filename.endswith((".xls", ".xlsx")):
             df = pd.read_excel(file_path)
         else:
             raise BadRequestException("Unsupported file format")
-
         df.columns = df.columns.str.strip().str.lower()
 
         required_cols = {"first_name", "last_name", "email", "department"}

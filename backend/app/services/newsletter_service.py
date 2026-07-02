@@ -5,7 +5,7 @@ from uuid import UUID
 from typing import List
 from datetime import datetime, timezone
 from app.core.config import settings
-from app.services.subscriber_service import retrieve_all_emails
+from app.services.subscriber_service import retrieve_all_emails, retrieve_subscribers_for_email
 from app.services.newsletter_styling import make_email_safe_html
 from app.schemas.newsletter_schemas import NewsletterCreate, NewsletterUpdate, NewsletterSchema
 from app.models.newsletter_model import Newsletter
@@ -24,7 +24,7 @@ def create_newsletter(newsletter: NewsletterCreate, db: Session) -> NewsletterSc
     db_newsletter = Newsletter(**newsletter.model_dump())
     if newsletter.status == "published":
         db_newsletter.published_at = datetime.now(tz = timezone.utc)
-        send_email(thumbnail=newsletter.thumbnail, subject=newsletter.title, html_content=newsletter.content, slug=newsletter.slug, published_at=db_newsletter.published_at, recipients=retrieve_all_emails(db=db))
+        send_email(thumbnail=newsletter.thumbnail, subject=newsletter.title, html_content=newsletter.content, slug=newsletter.slug, published_at=db_newsletter.published_at, recipients=retrieve_subscribers_for_email(db=db))
 
 
     db.add(db_newsletter)
@@ -68,7 +68,7 @@ def update_newsletter(slug: str, newsletter: NewsletterUpdate, db: Session) -> N
 
     if newsletter.status == "published" and db_newsletter.published_at is None:
         db_newsletter.published_at = datetime.now(tz = timezone.utc)
-        send_email(thumbnail=newsletter.thumbnail, subject=newsletter.title, html_content=newsletter.content, slug=newsletter.slug, published_at=db_newsletter.published_at, recipients=retrieve_all_emails(db=db))
+        send_email(thumbnail=newsletter.thumbnail, subject=newsletter.title, html_content=newsletter.content, slug=newsletter.slug, published_at=db_newsletter.published_at, recipients=retrieve_subscribers_for_email(db=db))
         
 
     db.commit()
@@ -84,7 +84,31 @@ def delete_newsletter(uuid: UUID, db: Session) -> None:
     db.commit()
     return None
 
-def send_email(thumbnail: str, subject: str, html_content: str, slug: str, published_at: datetime, recipients: List[str]):
+def _build_unsubscribe_footer(uuid: str) -> str:
+    unsubscribe_url = f"{settings.FRONTEND_URL}/unsubscribe/{uuid}"
+    return f"""
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+           style="margin-top:32px; border-top:1px solid #e5e5e5; padding-top:16px;">
+      <tr>
+        <td style="text-align:center; font-size:11px; color:#999; font-family:Helvetica,Arial,sans-serif;">
+          You are receiving this because you subscribed to SyncUp Newsletter.<br/>
+          <a href="{unsubscribe_url}"
+             style="color:#999; text-decoration:underline; font-size:11px;">
+            Unsubscribe
+          </a>
+        </td>
+      </tr>
+    </table>
+    """
+
+def send_email(
+    thumbnail: str,
+    subject: str,
+    html_content: str,
+    slug: str,
+    published_at: datetime,
+    recipients: list[tuple[str, str]]   # list of (uuid, email)
+):
     pub_date_str = published_at.strftime("%B %d, %Y") if published_at else ""
 
     header_html = f"""
@@ -105,24 +129,31 @@ def send_email(thumbnail: str, subject: str, html_content: str, slug: str, publi
     </table>
     """
 
-
-    full_html = header_html + html_content
-
-    wrapped_html = make_email_safe_html(full_html)
     try:
         with smtplib.SMTP(settings.SMTP_SERVER, settings.SMTP_PORT) as server:
             server.starttls()
             server.login(settings.ADMIN_EMAIL, settings.SMTP_PASSWORD)
 
-            for recipient in recipients:
+            for uuid, email in recipients:
+                # Build a personalized unsubscribe footer per recipient
+                footer_html = _build_unsubscribe_footer(uuid)
+                full_html = header_html + html_content + footer_html
+                wrapped_html = make_email_safe_html(full_html)
+
                 msg = MIMEMultipart()
                 msg["From"] = settings.ADMIN_EMAIL
-                msg["To"] = recipient
+                msg["To"] = email
                 msg["Subject"] = subject
                 msg.attach(MIMEText(wrapped_html, "html"))
 
-                server.sendmail(settings.ADMIN_EMAIL, recipient, msg.as_string())
+                server.sendmail(settings.ADMIN_EMAIL, email, msg.as_string())
 
-    except Exception as e:
+    except TimeoutError:
+        print("SMTP connection timed out — check SMTP_SERVER, SMTP_PORT, and firewall settings")
+        raise BadRequestException("Email service unavailable. Newsletter was saved but emails were not sent.")
+    except smtplib.SMTPAuthenticationError:
+        print("SMTP authentication failed — check ADMIN_EMAIL and SMTP_PASSWORD")
+        raise BadRequestException("Email authentication failed. Check your SMTP credentials.")
+    except Exception:
         print(traceback.format_exc())
-        raise BadRequestException()
+        raise BadRequestException("Failed to send emails.")

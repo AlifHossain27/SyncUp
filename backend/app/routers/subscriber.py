@@ -11,6 +11,7 @@ from app.services.subscriber_service import (
     retrieve_subscribers,
     retrieve_subscriber_by_uuid,
     delete_subscriber,
+    unsubscribe_subscriber,
     process_subscribers_upload,
     get_subscriber_growth
 )
@@ -84,6 +85,16 @@ async def delete_subscriber_route(uuid: UUID, db: Session = Depends(get_db), cur
     except (NotFoundException, BadRequestException) as error:
         raise error
     except Exception as e:
+        print(traceback.format_exc())
+        raise BadRequestException()
+    
+@subscriber_router.delete("/subscriber/unsubscribe/{uuid}/", status_code=200)
+async def unsubscribe_route(uuid: UUID, db: Session = Depends(get_db)):
+    try:
+        return unsubscribe_subscriber(uuid=uuid, db=db)
+    except NotFoundException as error:
+        raise error
+    except Exception:
         print(traceback.format_exc())
         raise BadRequestException()
         

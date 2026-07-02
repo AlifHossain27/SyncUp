@@ -87,6 +87,22 @@ export async function delete_subscriber(uuid: string) {
     return { ok: resp.ok, status: resp.status, body: data };
 }
 
+export async function unsubscribe(uuid: string) {
+    const resp = await fetch(`${API_BASE_URL}/api/subscriber/unsubscribe/${uuid}/`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+    });
+
+    let data = null;
+    if (resp.status !== 200) {
+        try { data = await resp.json(); } catch { /* empty */ }
+    } else {
+        try { data = await resp.json(); } catch { /* empty */ }
+    }
+
+    return { ok: resp.ok, status: resp.status, body: data };
+}
+
 export async function uploadSubscribersFile(file: File) {
     const formData = new FormData();
     formData.append("file", file);
